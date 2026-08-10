@@ -1,0 +1,16 @@
+MASTER VENDOR SERVICES AGREEMENT
+
+1. DEFINITIONS AND JURISDICTION
+This Master Services Agreement is entered into between Global Procurement Corp ("Customer") and ABC Logistics Ltd ("Supplier"), governed under the laws of South Africa.
+
+2. OPERATOR OBLIGATIONS AND POPIA COMPLIANCE
+Supplier agrees to process Personal Information solely with the authorization of Customer. Supplier shall treat all personal information as confidential in terms of POPIA Act 4 of 2013 Section 21.
+
+3. SECURITY INCIDENT NOTIFICATION
+In the event of any security compromise or unauthorized access to personal information, Supplier shall notify Customer in writing within 120 hours of becoming aware of such incident.
+
+4. INDEMNIFICATION AND LIABILITY EXPOSURE
+Supplier agrees to indemnify and hold harmless Customer from any third-party claims. The total aggregate liability of Supplier under this agreement shall be unlimited.
+
+5. GOVERNING STATUTES
+This agreement complies with POPIA Section 19 and Companies Act Section 66.

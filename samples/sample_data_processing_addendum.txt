@@ -1,0 +1,13 @@
+DATA PROCESSING ADDENDUM (DPA)
+
+SECTION 1. PURPOSE AND JURISDICTION
+This Data Processing Addendum complements the SaaS Master Agreement governed by the laws of South Africa and European Union GDPR.
+
+SECTION 2. SECURITY MEASURES
+Processor shall implement reasonable technical and organizational security measures to protect data against accidental loss or damage pursuant to POPIA Section 19 and GDPR Article 28.
+
+SECTION 3. INCIDENT RESPONSE SLA
+Processor shall notify Controller without undue delay and in any event within 24 hours of discovery of any Data Breach.
+
+SECTION 4. INTERNATIONAL TRANSFERS
+Personal Data may be freely transferred to offshore cloud servers without additional data subject consent or safeguards.
