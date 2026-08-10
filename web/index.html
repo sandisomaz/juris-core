@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JurisCore — Legal & Regulatory Intelligence Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">⚖️</div>
+      <div>
+        <div class="brand-title">JurisCore</div>
+        <div class="brand-tagline">Legal Intelligence Platform</div>
+      </div>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="switchNav('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </li>
+      <li class="nav-item" onclick="switchNav('matters')">
+        <span class="nav-icon">📁</span> Matters & Clients
+      </li>
+      <li class="nav-item" onclick="switchNav('workspace')">
+        <span class="nav-icon">🔍</span> Review Workspace
+      </li>
+      <li class="nav-item" onclick="switchNav('rules')">
+        <span class="nav-icon">📜</span> Rules Engine
+      </li>
+      <li class="nav-item" onclick="switchNav('trace')">
+        <span class="nav-icon">⚡</span> Agent Trace Log
+      </li>
+      <li class="nav-item" onclick="switchNav('analytics')">
+        <span class="nav-icon">📈</span> Analytics
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-title" id="page-title">Executive Dashboard</div>
+      <div class="user-badge">
+        <div class="avatar">SC</div>
+        <span>Senior Compliance Counsel</span>
+      </div>
+    </header>
+
+    <!-- VIEW 1: DASHBOARD -->
+    <main id="view-dashboard" class="view-content active">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-num" id="metric-matters">2</div>
+          <div class="metric-label">Active Matters</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num" id="metric-findings" style="color: var(--danger-red);">6</div>
+          <div class="metric-label">Risk Findings</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num" id="metric-pending" style="color: var(--warning-orange);">4</div>
+          <div class="metric-label">Pending Human Reviews</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num" id="metric-saved" style="color: var(--success-green);">4.5 hrs</div>
+          <div class="metric-label">Estimated Time Saved</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; font-weight: 700;">Active Matters Overview</h2>
+        <button class="btn btn-primary" onclick="switchNav('matters')" style="margin-left: auto;">+ New Matter</button>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Matter Title</th>
+            <th>Client</th>
+            <th>Jurisdiction</th>
+            <th>Risk Level</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="dashboard-matters-list">
+          <!-- Populated by app.js -->
+        </tbody>
+      </table>
+    </main>
+
+    <!-- VIEW 2: MATTERS -->
+    <main id="view-matters" class="view-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Matter Portfolio</h2>
+        <button class="btn btn-primary" onclick="openCreateMatterModal()">+ Create Matter</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Client</th>
+            <th>Jurisdiction</th>
+            <th>Risk Level</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="matters-full-list"></tbody>
+      </table>
+    </main>
+
+    <!-- VIEW 3: 3-COLUMN DOCUMENT REVIEW WORKSPACE -->
+    <main id="view-workspace" class="workspace-container">
+      <!-- COLUMN 1: CLAUSE DOM TREE -->
+      <div class="workspace-col col-left">
+        <div class="col-header">
+          <span>Clause DOM Tree</span>
+          <span style="font-size: 10px; color: var(--primary-accent);" id="clause-count-tag">0 Clauses</span>
+        </div>
+        <div class="col-body" id="clause-tree-body">
+          <div style="font-size: 12px; color: var(--text-muted);">Select or load a matter to view structured clauses...</div>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: DOCUMENT VIEWER -->
+      <div class="workspace-col col-center">
+        <div class="col-header">
+          <span id="doc-viewer-title">Document Reader</span>
+          <button class="btn btn-primary btn-sm" onclick="runAnalysisForCurrentDoc()">⚡ Run Agent Review</button>
+        </div>
+        <div class="col-body">
+          <div class="document-viewer" id="document-text-container">
+            Click "Run Agent Review" above to execute the multi-agent legal review workflow on the sample contract...
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: AI REVIEW FINDINGS & HUMAN ACTION BAR -->
+      <div class="workspace-col col-right">
+        <div class="col-header">
+          <span>AI Compliance Findings</span>
+          <button class="btn btn-outline" onclick="exportReport('html')">Export Report</button>
+        </div>
+        <div class="col-body" id="findings-cards-body">
+          <div style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 40px;">
+            Run analysis to populate findings verified by the deterministic rules engine...
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- VIEW 4: RULES ENGINE -->
+    <main id="view-rules" class="view-content">
+      <h2>Deterministic Rules Registry</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 13px;">Verified statutory sources from the Legal Source Registry (POPIA, GDPR, Companies Act).</p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Legislation</th>
+            <th>Act Number</th>
+            <th>Section</th>
+            <th>Title</th>
+            <th>Effective Date</th>
+          </tr>
+        </thead>
+        <tbody id="rules-sources-list"></tbody>
+      </table>
+    </main>
+
+    <!-- VIEW 5: AGENT TRACE LOG -->
+    <main id="view-trace" class="view-content">
+      <h2>Agent Execution Trace Viewer</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 13px;">Real-time step trace log showing graph state transitions and execution latency.</p>
+      <div id="trace-list-container" style="max-width: 800px;">
+        <div class="trace-step">
+          <div class="trace-name">IntakeAgent <span class="trace-time">1.2ms</span></div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 40px;">No active trace run yet. Trigger review in Workspace to view live trace log.</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- VIEW 6: ANALYTICS -->
+    <main id="view-analytics" class="view-content">
+      <h2>Platform Operational Analytics</h2>
+      <div class="metrics-grid" style="margin-top: 20px;">
+        <div class="metric-card">
+          <div class="metric-num">100%</div>
+          <div class="metric-label">Deterministic Verification Rate</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">18.4s</div>
+          <div class="metric-label">Average Review Latency</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">0.0%</div>
+          <div class="metric-label">Unverified Hallucinations</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">4.5 hrs</div>
+          <div class="metric-label">Legal Hours Saved</div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
