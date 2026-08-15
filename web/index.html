@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JurisCore — Clear Path Legal Studio</title>
+  <title>JurisCore — Plain-Language Legal Studio</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Markmap Autoloader CDN for interactive contract mind mapping -->
   <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
@@ -61,7 +61,7 @@
       </div>
     </header>
 
-    <!-- VIEW 1: NOTEBOOKLM 3-COLUMN STUDIO WORKSPACE -->
+    <!-- VIEW 1: STUDIO WORKSPACE -->
     <div id="view-workspace" class="studio-workspace">
       
       <!-- COLUMN 1: SOURCES & CLAUSE DOM -->
@@ -72,6 +72,8 @@
         </div>
         
         <div class="col-body">
+          <input type="text" class="sources-search-box" placeholder="Search sources or clauses..." onkeyup="filterSourcesAndClauses(event)">
+
           <!-- Drag & Drop Zone -->
           <div class="upload-dropzone" id="dropzone" onclick="triggerFileInput()">
             <div class="dropzone-icon">📥</div>
@@ -200,8 +202,17 @@
                 I've reviewed your contract. I found <strong>2 items</strong> you should look at — nothing scary, just a breach SLA timeline and an uncapped liability exposure. Ask me anything about these clauses in plain language!
               </div>
             </div>
+
+            <!-- Action Prompt Suggestion Chips -->
+            <div class="prompt-chips-bar">
+              <div class="prompt-chip" onclick="clickPromptChip('Summarize Agreement')">✨ Summarize Agreement</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Explain SLA Gap')">⚠️ Explain SLA Gap</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Draft Redline for Clause 3')">✍️ Draft SLA Redline</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Check POPIA §22 Requirement')">⚖️ Check POPIA §22</div>
+            </div>
+
             <div class="chat-input-bar">
-              <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question about this contract or request a plain memo..." onkeypress="handleChatKeyPress(event)">
+              <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question or request a plain memo..." onkeypress="handleChatKeyPress(event)">
               <button class="btn btn-teal" onclick="sendChatMessage()">Ask Assistant</button>
             </div>
           </div>
@@ -224,6 +235,30 @@
 
           <!-- TAB 1: FINDINGS & ACTION PLAN -->
           <div id="studio-tab-findings" class="studio-tab-content active">
+            <!-- Studio Feature Grid Cards (NotebookLM Style) -->
+            <div class="studio-grid">
+              <div class="studio-grid-card" onclick="switchStudioTab('audio')">
+                <div class="grid-card-icon">🎙️</div>
+                <div class="grid-card-title">Audio Briefing</div>
+                <div class="grid-card-sub">2-Host Legal Podcast</div>
+              </div>
+              <div class="studio-grid-card" onclick="switchStudioTab('mindmap')">
+                <div class="grid-card-icon">🗺️</div>
+                <div class="grid-card-title">Contract Mind Map</div>
+                <div class="grid-card-sub">Hierarchical SVG Map</div>
+              </div>
+              <div class="studio-grid-card" onclick="switchStudioTab('flashcards')">
+                <div class="grid-card-icon">🃏</div>
+                <div class="grid-card-title">Study Flashcards</div>
+                <div class="grid-card-sub">3D Active Recall Deck</div>
+              </div>
+              <div class="studio-grid-card" onclick="switchStudioTab('redlines')">
+                <div class="grid-card-icon">✂️</div>
+                <div class="grid-card-title">Surgical Redlines</div>
+                <div class="grid-card-sub">Inline Token Diffs</div>
+              </div>
+            </div>
+
             <!-- Health Score Meter -->
             <div class="compliance-health-card">
               <div class="health-title">Compliance Health Score</div>

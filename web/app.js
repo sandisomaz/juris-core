@@ -316,6 +316,22 @@ function rejectFinding(findingId) {
   alert("Finding marked as rejected by counsel.");
 }
 
+function clickPromptChip(text) {
+  const input = document.getElementById("chat-input");
+  if (input) {
+    input.value = text;
+    sendChatMessage();
+  }
+}
+
+function filterSourcesAndClauses(e) {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll(".source-item, .clause-nav-item").forEach(el => {
+    const text = el.innerText.toLowerCase();
+    el.style.display = text.includes(query) ? "flex" : "none";
+  });
+}
+
 function exportReport(format) {
   if (currentReport) {
     window.open(`/api/reports/${currentReport.report_id}/export/${format}`, '_blank');
@@ -323,3 +339,4 @@ function exportReport(format) {
     alert("Plain-language executive memo exported to PDF.");
   }
 }
+
