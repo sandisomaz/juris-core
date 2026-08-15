@@ -14,7 +14,7 @@
   <header>
     <div class="brand">
       <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
-        <path d="M32 6 L52 14 V30 C52 44 43 53 32 58 C21 53 12 44 12 30 V14 L32 6Z" stroke="#FAF9FD" stroke-width="3" stroke-linejoin="round" fill="none"/>
+        <path d="M32 6 L52 14 V30 C52 44 43 53 32 58 C21 53 12 44 12 30 V14 L32 6Z" stroke="#002045" stroke-width="3" stroke-linejoin="round" fill="none"/>
         <path d="M23 31 L29 37 L41 24" stroke="#006A63" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
       <span class="name">JurisCore</span>
@@ -25,7 +25,7 @@
     <div class="panel-toggles">
       <button class="toggle-btn active" id="btn-toggle-left" onclick="togglePanel('left')" title="Toggle Sources Panel">📁 Sources</button>
       <button class="toggle-btn active" id="btn-toggle-right" onclick="togglePanel('right')" title="Toggle Studio Panel">🎛️ Studio</button>
-      <button class="btn btn-teal" style="margin-left: 8px;" onclick="exportAuditTrail()">📥 Export Audit Trail</button>
+      <button class="btn btn-navy" style="margin-left: 8px;" onclick="exportAuditTrail()">📥 Export Audit Trail</button>
     </div>
   </header>
 
@@ -133,12 +133,12 @@
         </div>
       </div>
 
-      <!-- Persistent Agent Trace Dock (Transparency Layer) -->
+      <!-- Persistent Agent Trace Dock (Active Only When Work Is Happening) -->
       <div class="trace-dock">
         <div class="trace-head" onclick="toggleTraceExpand()">
           <div class="trace-title">
-            <div class="pulse-dot"></div>
-            AGENT TRACE LOG & OBSERVABILITY FEED
+            <div class="pulse-dot" id="trace-pulse-dot"></div>
+            <span id="trace-status-text">AGENT TRACE LOG • IDLE (CLICK TO EXPAND)</span>
           </div>
           <span style="font-size: 11px; color: var(--text-tertiary);" id="trace-toggle-arrow">▲ Expand Log</span>
         </div>
@@ -165,8 +165,8 @@
         <!-- TAB 1: COMPLIANCE REPORT -->
         <div id="studio-tab-report" class="studio-content-block active">
           <div class="panel-title" style="margin-bottom: 10px;">Executive Compliance Memorandum</div>
-          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-secondary);">
-            <strong style="color: var(--text-primary);">Matter Audit Summary</strong><br>
+          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-primary);">
+            <strong style="color: var(--navy);">Matter Audit Summary</strong><br>
             Jurisdiction: South Africa (POPIA Act 4 of 2013)<br>
             Compliance Score: <b style="color: var(--amber);">62%</b><br><br>
             <b>Key Findings:</b>
@@ -182,7 +182,7 @@
           <div class="panel-title" style="margin-bottom: 10px;">Surgical Redlines Sandbox</div>
           <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
             <b>Clause 3.0 SLA Amendment:</b><br>
-            <div class="mono" style="margin-top: 6px; padding: 8px; background: var(--bg); border-radius: 4px;">
+            <div class="mono" style="margin-top: 6px; padding: 8px; background: var(--surface-card); border-radius: 4px; border: 1px solid var(--border-dark);">
               <span style="color: var(--red); text-decoration: line-through;">within 120 hours of becoming aware</span> 
               <span style="color: var(--clear); font-weight: 600;">without undue delay and in any event within 24 hours of becoming aware</span>
             </div>
@@ -204,10 +204,10 @@
         <!-- TAB 4: AUDIT TRAIL EXPORT -->
         <div id="studio-tab-audit" class="studio-content-block">
           <div class="panel-title" style="margin-bottom: 10px;">Immutable Audit Record</div>
-          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
+          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12px; color: var(--text-primary);">
             Every autonomous agent action and human sign-off is recorded with an immutable SHA-256 hash.
             <br><br>
-            <button class="btn btn-teal" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
+            <button class="btn btn-navy" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
           </div>
         </div>
 
