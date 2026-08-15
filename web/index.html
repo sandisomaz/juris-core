@@ -3,524 +3,217 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JurisCore — Clear Path Compliance Studio</title>
+  <title>JurisCore — Regulatory Intelligence Workspace</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Markmap Autoloader CDN for interactive contract mind mapping -->
+  <!-- Markmap Autoloader CDN for interactive contract relationship graph -->
   <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
 </head>
 <body>
 
-  <!-- Navigation Sidebar -->
-  <aside class="sidebar">
+  <!-- Workspace Top Header -->
+  <header>
     <div class="brand">
-      <div class="brand-mark">
-        <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
-          <path d="M32 6 L52 14 V30 C52 44 43 53 32 58 C21 53 12 44 12 30 V14 L32 6Z" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
-          <path d="M23 31 L29 37 L41 24" stroke="#79f7ea" stroke-width="5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-title">JurisCore</div>
-        <div class="brand-sub">Clear Path Studio</div>
-      </div>
+      <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
+        <path d="M32 6 L52 14 V30 C52 44 43 53 32 58 C21 53 12 44 12 30 V14 L32 6Z" stroke="#FAF9FD" stroke-width="3" stroke-linejoin="round" fill="none"/>
+        <path d="M23 31 L29 37 L41 24" stroke="#006A63" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="name">JurisCore</span>
+      <div class="matter">Matter: <b>ABC Logistics Vendor Onboarding & POPIA Audit</b></div>
     </div>
 
-    <ul class="nav-list">
-      <li class="nav-item active" onclick="switchNav('workspace')">
-        <span>📖</span> Studio Workspace
-      </li>
-      <li class="nav-item" onclick="switchNav('dashboard')">
-        <span>📊</span> Dashboard
-      </li>
-      <li class="nav-item" onclick="switchNav('matters')">
-        <span>📁</span> Matters Portfolio
-      </li>
-      <li class="nav-item" onclick="switchNav('rules')">
-        <span>📜</span> Rules Registry
-      </li>
-      <li class="nav-item" onclick="switchNav('trace')">
-        <span>⚡</span> Agent Trace Log
-      </li>
-      <li class="nav-item" onclick="switchNav('analytics')">
-        <span>📈</span> Analytics
-      </li>
-    </ul>
-  </aside>
+    <!-- Panel Toggles -->
+    <div class="panel-toggles">
+      <button class="toggle-btn active" id="btn-toggle-left" onclick="togglePanel('left')" title="Toggle Sources Panel">📁 Sources</button>
+      <button class="toggle-btn active" id="btn-toggle-right" onclick="togglePanel('right')" title="Toggle Studio Panel">🎛️ Studio</button>
+      <button class="btn btn-teal" style="margin-left: 8px;" onclick="exportAuditTrail()">📥 Export Audit Trail</button>
+    </div>
+  </header>
 
-  <!-- Main Content Wrapper -->
-  <div class="main-wrapper">
-    <!-- Top Header -->
-    <header class="top-header">
-      <div class="page-title" id="page-title">Compliance Review Studio</div>
-      <div class="header-right">
-        <div class="status-badge">
-          <div class="status-dot"></div>
-          100% DETERMINISTIC VERIFIED
-        </div>
-        <button class="btn btn-navy" onclick="openAddSourcesModal()">+ Add Sources</button>
+  <!-- 3-Panel Workspace Grid -->
+  <div class="workspace" id="workspace-grid">
+
+    <!-- PANEL 1: SOURCES (Left, ~280px) -->
+    <aside class="sources" id="panel-sources">
+      <div class="panel-head">
+        <div class="panel-title">Sources (<span id="sources-count-label">2</span>)</div>
+        <button class="btn btn-outline" style="padding: 2px 8px; font-size: 10px;" onclick="triggerFileInput()">+ Batch Add</button>
       </div>
-    </header>
 
-    <!-- VIEW 1: STUDIO WORKSPACE -->
-    <div id="view-workspace" class="studio-workspace">
-      
-      <!-- COLUMN 1: SOURCES & CLAUSE DOM -->
-      <div class="studio-col col-sources">
-        <div class="col-header">
-          <div class="col-header-title">Sources (<span id="sources-count-label">2</span>)</div>
-          <button class="btn btn-outline" style="padding: 2px 8px; font-size: 10px;" onclick="openAddSourcesModal()">+ Add</button>
+      <!-- Multi-File Drag-and-Drop Dropzone -->
+      <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
+        <b>Drop documents here</b>
+        Accepts PDF, DOCX, TXT up to 25MB
+        <input type="file" id="file-input" multiple style="display:none" onchange="handleFileSelected(event)">
+      </div>
+
+      <!-- Source Card List with Processing Status Chips -->
+      <div class="source-list" id="source-list-container">
+        <div class="source-card selected" onclick="selectSource('doc-001')">
+          <div class="source-name">1. Supplier_Agreement.txt</div>
+          <div class="source-meta">
+            <span class="source-type">CONTRACT • 4.2 KB</span>
+            <span class="chip verified">VERIFIED</span>
+          </div>
         </div>
-        
-        <div class="col-body">
-          <input type="text" class="sources-search-box" placeholder="Search sources or clauses..." onkeyup="filterSourcesAndClauses(event)">
 
-          <!-- Drag & Drop Zone -->
-          <div class="upload-dropzone" id="dropzone" onclick="triggerFileInput()">
-            <div class="dropzone-icon">📥</div>
-            <div class="dropzone-title">Drop contracts here</div>
-            <div class="dropzone-sub">PDF, DOCX, TXT up to 25MB</div>
-            <input type="file" id="file-input" style="display:none" onchange="handleFileSelected(event)">
-          </div>
-
-          <!-- Sources List -->
-          <div id="sources-list-container">
-            <div class="source-item active">
-              <input type="checkbox" class="source-checkbox" checked>
-              <div class="source-name">1. Supplier_Agreement.txt</div>
-              <span class="source-badge">TXT</span>
-            </div>
-
-            <div class="source-item">
-              <input type="checkbox" class="source-checkbox" checked>
-              <div class="source-name">2. Data_Processing_DPA.txt</div>
-              <span class="source-badge">TXT</span>
-            </div>
-          </div>
-
-          <!-- Clause DOM Tree -->
-          <div class="clause-tree-section">
-            <div class="col-header-title" style="margin-bottom: 10px;">Clause DOM Tree</div>
-            <div id="clause-tree-list">
-              <div class="clause-nav-item" onclick="scrollToClause('1_0')">
-                <span class="clause-nav-title">1. DEFINITIONS</span>
-                <span class="chip chip-clear">CLEAR</span>
-              </div>
-              <div class="clause-nav-item" onclick="scrollToClause('2_0')">
-                <span class="clause-nav-title">2. OPERATOR SECURITY</span>
-                <span class="chip chip-clear">CLEAR</span>
-              </div>
-              <div class="clause-nav-item" onclick="scrollToClause('3_0')">
-                <span class="clause-nav-title">3. BREACH SLA</span>
-                <span class="chip chip-stop">SLA FAIL</span>
-              </div>
-              <div class="clause-nav-item" onclick="scrollToClause('4_0')">
-                <span class="clause-nav-title">4. LIABILITY CAP</span>
-                <span class="chip chip-stop">UNCAPPED</span>
-              </div>
-              <div class="clause-nav-item" onclick="scrollToClause('5_0')">
-                <span class="clause-nav-title">5. GOVERNING LAW</span>
-                <span class="chip chip-teal">POPIA s22</span>
-              </div>
-            </div>
+        <div class="source-card" onclick="selectSource('doc-002')">
+          <div class="source-name">2. Data_Processing_DPA.txt</div>
+          <div class="source-meta">
+            <span class="source-type">DPA • 2.8 KB</span>
+            <span class="chip review">NEEDS REVIEW</span>
           </div>
         </div>
       </div>
 
-      <!-- COLUMN 2: READER & PLAIN ASSISTANT -->
-      <div class="studio-col col-reader">
-        <div class="col-header">
-          <div class="col-header-title" id="active-doc-header">Master Supplier Agreement v3.pdf</div>
-          <button class="btn btn-teal" onclick="runComplianceAnalysis()">⚡ Analyze Document</button>
-        </div>
-
-        <div class="col-body">
-          <!-- Reader Canvas -->
-          <div class="reader-canvas">
-            <div class="reader-text" id="reader-content">
-              <div class="clause-block" id="clause-block-1_0">
-                <div class="clause-header">
-                  <span>1. DEFINITIONS & JURISDICTION</span>
-                  <div class="citation-tooltip-wrapper">
-                    <span class="citation-tag">POPIA Act 4 of 2013</span>
-                    <div class="citation-tooltip-card">
-                      <strong>POPIA Act 4 of 2013</strong><br>
-                      Protection of Personal Information Act. Governing data protection law in South Africa.
-                    </div>
-                  </div>
-                </div>
-                This Master Services Agreement is entered into under the jurisdiction of South Africa.
-              </div>
-
-              <div class="clause-block" id="clause-block-2_0">
-                <div class="clause-header">
-                  <span>2. OPERATOR OBLIGATIONS & SECURITY</span>
-                  <div class="citation-tooltip-wrapper">
-                    <span class="citation-tag">POPIA §21</span>
-                    <div class="citation-tooltip-card">
-                      <strong>POPIA Section 21</strong><br>
-                      Operator must process personal information only with authorization and treat data as confidential. Status: <span style="color:#86efac;">VALID</span>
-                    </div>
-                  </div>
-                </div>
-                The Operator agrees to process Personal Information on behalf of the Responsible Party. The Operator shall maintain confidential treatment of all data.
-              </div>
-
-              <div class="clause-block highlight-stop" id="clause-block-3_0">
-                <div class="clause-header">
-                  <span>3. SECURITY INCIDENT NOTIFICATION</span>
-                  <span class="chip chip-stop">Defective Breach SLA</span>
-                </div>
-                In the event of a security compromise or data breach, the Operator shall notify the Responsible Party in writing within 120 hours of becoming aware of such incident.
-              </div>
-
-              <div class="clause-block highlight-stop" id="clause-block-4_0">
-                <div class="clause-header">
-                  <span>4. LIMITATION OF LIABILITY & INDEMNITY</span>
-                  <span class="chip chip-stop">Uncapped Risk</span>
-                </div>
-                The Supplier provides an indemnity to the Customer for all losses. There shall be unlimited liability exposure without any financial cap.
-              </div>
-
-              <div class="clause-block" id="clause-block-5_0">
-                <div class="clause-header">
-                  <span>5. STATUTORY GOVERNING LAW</span>
-                  <div class="citation-tooltip-wrapper">
-                    <span class="citation-tag">POPIA §22</span>
-                    <div class="citation-tooltip-card">
-                      <strong>POPIA Section 22</strong><br>
-                      Notification of security compromises must occur immediately / as soon as reasonably possible. Status: <span style="color:#86efac;">VALID</span>
-                    </div>
-                  </div>
-                </div>
-                This agreement references POPIA Section 22 and Companies Act Section 66.
-              </div>
-            </div>
+      <!-- Clause Hierarchy DOM Section -->
+      <div class="clause-tree-section">
+        <div class="panel-title" style="margin-bottom: 8px;">Extracted Clause DOM</div>
+        <div id="clause-tree-list">
+          <div class="clause-tree-item" onclick="scrollToClause('1_0')">
+            <span>1. DEFINITIONS</span>
+            <span class="chip verified">VALID</span>
           </div>
+          <div class="clause-tree-item" onclick="scrollToClause('2_0')">
+            <span>2. OPERATOR SECURITY</span>
+            <span class="chip verified">VALID</span>
+          </div>
+          <div class="clause-tree-item" onclick="scrollToClause('3_0')">
+            <span>3. BREACH SLA TIMELINE</span>
+            <span class="chip review">WRONG_SECTION</span>
+          </div>
+          <div class="clause-tree-item" onclick="scrollToClause('4_0')">
+            <span>4. LIMITATION OF LIABILITY</span>
+            <span class="chip checking">UNCAPPED</span>
+          </div>
+        </div>
+      </div>
+    </aside>
 
-          <!-- Assistant Chat Area -->
-          <div class="assistant-container">
-            <div class="chat-history" id="chat-history">
-              <div class="chat-bubble assistant">
-                I've reviewed your contract. I found <strong>2 items</strong> you should look at — nothing scary, just a breach SLA timeline and an uncapped liability exposure. Ask me anything about these clauses in plain language!
-              </div>
-            </div>
-
-            <!-- Action Prompt Suggestion Chips -->
-            <div class="prompt-chips-bar">
-              <div class="prompt-chip" onclick="clickPromptChip('Summarize Agreement')">✨ Summarize Agreement</div>
-              <div class="prompt-chip" onclick="clickPromptChip('Explain SLA Gap')">⚠️ Explain SLA Gap</div>
-              <div class="prompt-chip" onclick="clickPromptChip('Draft Redline for Clause 3')">✍️ Draft SLA Redline</div>
-              <div class="prompt-chip" onclick="clickPromptChip('Check POPIA §22 Requirement')">⚖️ Check POPIA §22</div>
-            </div>
-
-            <div class="chat-input-bar">
-              <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question or request a plain memo..." onkeypress="handleChatKeyPress(event)">
-              <button class="btn btn-teal" onclick="sendChatMessage()">Ask Assistant</button>
-            </div>
+    <!-- PANEL 2: WORKSPACE (Center, Primary Focus) -->
+    <main class="ws-col" id="panel-workspace">
+      <!-- Grounded Chat Conversation Stream -->
+      <div class="chat" id="chat-stream">
+        <div class="msg ai">
+          <div class="ai-body">
+            I have completed the multi-agent compliance evaluation for this matter across all <strong>2 sources</strong>. 
+            I found 2 critical discrepancies:
+            <br><br>
+            1. <strong>Defective Incident Notification Window</strong>: Clause 3.0 specifies a 120-hour notice SLA, which fails the statutory requirements of <span class="cite wrong" onclick="scrollToClause('3_0')">POPIA §22 · WRONG_SECTION</span>.
+            <br><br>
+            2. <strong>Uncapped Liability Exposure</strong>: Clause 4.0 provides an indemnity with unlimited financial exposure <span class="cite outdated" onclick="scrollToClause('4_0')">Clause 4.0 · UNCAPPED</span>.
           </div>
         </div>
       </div>
 
-      <!-- COLUMN 3: MULTI-MODAL STUDIO CANVAS -->
-      <div class="studio-col col-studio">
-        
-        <!-- Studio Deliverables Tab Bar -->
-        <div class="studio-tab-bar">
-          <div class="studio-tab active" onclick="switchStudioTab('findings')">Findings</div>
-          <div class="studio-tab" onclick="switchStudioTab('audio')">🎙️ Audio</div>
-          <div class="studio-tab" onclick="switchStudioTab('mindmap')">🗺️ Mind Map</div>
-          <div class="studio-tab" onclick="switchStudioTab('flashcards')">🃏 Cards</div>
-          <div class="studio-tab" onclick="switchStudioTab('redlines')">✂️ Redlines</div>
+      <!-- Chat Bar & Action Prompt Suggestions -->
+      <div class="chat-input-container">
+        <div class="prompt-chips-bar">
+          <div class="prompt-chip" onclick="clickPromptChip('Cross-reference DPA against Master Supplier Agreement')">🔄 Cross-Reference DPA</div>
+          <div class="prompt-chip" onclick="clickPromptChip('Check POPIA §22 statutory breach SLA requirements')">⚖️ Verify POPIA §22</div>
+          <div class="prompt-chip" onclick="clickPromptChip('Generate surgical redline for Clause 3.0 SLA')">✍️ Draft SLA Redline</div>
         </div>
 
-        <div class="col-body">
-
-          <!-- TAB 1: FINDINGS & ACTION PLAN -->
-          <div id="studio-tab-findings" class="studio-tab-content active">
-            <!-- Studio Feature Grid Cards (NotebookLM Style) -->
-            <div class="studio-grid">
-              <div class="studio-grid-card" onclick="switchStudioTab('audio')">
-                <div class="grid-card-icon">🎙️</div>
-                <div class="grid-card-title">Audio Briefing</div>
-                <div class="grid-card-sub">2-Host Legal Podcast</div>
-              </div>
-              <div class="studio-grid-card" onclick="switchStudioTab('mindmap')">
-                <div class="grid-card-icon">🗺️</div>
-                <div class="grid-card-title">Contract Mind Map</div>
-                <div class="grid-card-sub">Hierarchical SVG Map</div>
-              </div>
-              <div class="studio-grid-card" onclick="switchStudioTab('flashcards')">
-                <div class="grid-card-icon">🃏</div>
-                <div class="grid-card-title">Study Flashcards</div>
-                <div class="grid-card-sub">3D Active Recall Deck</div>
-              </div>
-              <div class="studio-grid-card" onclick="switchStudioTab('redlines')">
-                <div class="grid-card-icon">✂️</div>
-                <div class="grid-card-title">Surgical Redlines</div>
-                <div class="grid-card-sub">Inline Token Diffs</div>
-              </div>
-            </div>
-
-            <!-- Health Score Meter -->
-            <div class="compliance-health-card">
-              <div class="health-title">Compliance Health Score</div>
-              <div class="health-score" id="health-score-num">77%</div>
-              <div style="font-size: 11.5px; opacity: 0.9;">2 Issues Flagged • 3 Clauses Verified Passed</div>
-            </div>
-
-            <!-- Finding Card 1 -->
-            <div class="finding-card">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span class="finding-title">Defective Breach SLA Timeline</span>
-                <span class="chip chip-stop">CRITICAL</span>
-              </div>
-              <div class="finding-desc">
-                Clause 3 requires notice within <strong>120 hours</strong>. POPIA §22 requires notification immediately / within 24-48 hours.
-              </div>
-              <div style="display: flex; gap: 6px; margin-top: 8px;">
-                <button class="btn btn-teal" style="font-size: 11px; padding: 4px 8px;" onclick="scrollToClause('3_0')">View Clause 3.0</button>
-                <button class="btn btn-outline" style="font-size: 11px; padding: 4px 8px;" onclick="switchStudioTab('redlines')">Inspect Redline</button>
-              </div>
-            </div>
-
-            <!-- Finding Card 2 -->
-            <div class="finding-card">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span class="finding-title">Uncapped Liability Exposure</span>
-                <span class="chip chip-blaze">HIGH RISK</span>
-              </div>
-              <div class="finding-desc">
-                Clause 4 provides an indemnity without any financial cap.
-              </div>
-              <div style="display: flex; gap: 6px; margin-top: 8px;">
-                <button class="btn btn-teal" style="font-size: 11px; padding: 4px 8px;" onclick="scrollToClause('4_0')">View Clause 4.0</button>
-                <button class="btn btn-outline" style="font-size: 11px; padding: 4px 8px;" onclick="switchStudioTab('redlines')">Inspect Redline</button>
-              </div>
-            </div>
-
-            <!-- Action Checklist -->
-            <div style="margin-top: 16px;">
-              <div class="col-header-title" style="margin-bottom: 8px;">Action Checklist</div>
-              <div class="action-item">
-                <input type="checkbox" class="action-checkbox" checked>
-                <div class="action-text">Verify POPIA §21 Operator contract terms</div>
-              </div>
-              <div class="action-item">
-                <input type="checkbox" class="action-checkbox">
-                <div class="action-text">Amend Clause 3 Breach Notification window to 24 hours</div>
-              </div>
-              <div class="action-item">
-                <input type="checkbox" class="action-checkbox">
-                <div class="action-text">Insert 12-month fee liability cap on indemnity clause</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TAB 2: AUDIO OVERVIEW PLAYER -->
-          <div id="studio-tab-audio" class="studio-tab-content">
-            <div class="audio-player-card">
-              <div class="audio-header">
-                <div>
-                  <div class="audio-title">Executive Legal Briefing</div>
-                  <div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">Alex (Partner) & Morgan (Counsel)</div>
-                </div>
-                <span class="audio-duration">1:15</span>
-              </div>
-
-              <!-- Animated Waveform -->
-              <div class="waveform-bar-container" id="waveform-container">
-                <div class="wave-bar"></div>
-                <div class="wave-bar active"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar active"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar active"></div>
-                <div class="wave-bar"></div>
-              </div>
-
-              <div class="audio-controls">
-                <button class="btn-play" id="audio-play-btn" onclick="toggleAudioPlayback()">▶</button>
-                <div style="font-size: 12px; color: rgba(255,255,255,0.9);" id="audio-status-label">Click play to listen</div>
-                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 10px; color: #fff; margin-left: auto;" onclick="toggleAudioSpeed()">1x</button>
-              </div>
-            </div>
-
-            <div class="col-header-title" style="margin-bottom: 8px;">Synchronized Transcript</div>
-            <div class="audio-transcript-container" id="transcript-body">
-              <!-- Populated by app.js -->
-            </div>
-          </div>
-
-          <!-- TAB 3: INTERACTIVE CONTRACT MIND MAP -->
-          <div id="studio-tab-mindmap" class="studio-tab-content">
-            <div class="col-header-title" style="margin-bottom: 8px;">Contract Structure Mind Map</div>
-            <p style="font-size: 11.5px; color: var(--muted); margin-bottom: 10px;">Click any node to navigate to the clause block.</p>
-            <div class="markmap-container">
-              <svg id="markmap-canvas"></svg>
-            </div>
-          </div>
-
-          <!-- TAB 4: 3D FLIP FLASHCARDS -->
-          <div id="studio-tab-flashcards" class="studio-tab-content">
-            <div class="col-header-title" style="margin-bottom: 8px;">Interactive Issue Study Deck</div>
-            <div class="flashcard-deck-wrapper">
-              <div class="flashcard-3d" id="flashcard-element" onclick="flipFlashcard()">
-                <div class="card-face card-front">
-                  <div>
-                    <span class="chip chip-stop" id="fc-category-badge">SLA & INCIDENT RESPONSE</span>
-                    <div class="flashcard-question" id="fc-question-text" style="margin-top: 14px;">
-                      Why is Clause 3's 120-hour security breach notification window non-compliant?
-                    </div>
-                  </div>
-                  <div style="font-size: 11px; color: var(--muted-light); text-align: right;">Click card to flip 🔄</div>
-                </div>
-
-                <div class="card-face card-back">
-                  <div>
-                    <span class="chip chip-clear">STATUTORY EXPLANATION</span>
-                    <div class="flashcard-answer" id="fc-answer-text" style="margin-top: 14px;">
-                      POPIA Section 22 requires notification immediately / within 24 to 48 hours of discovery. 120 hours exceeds the allowable statutory SLA.
-                    </div>
-                  </div>
-                  <div style="font-size: 11px; font-weight: 700; color: var(--teal);" id="fc-ref-text">POPIA Section 22</div>
-                </div>
-              </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <button class="btn btn-outline" onclick="prevFlashcard()">← Previous</button>
-              <span style="font-size: 12px; font-weight: 700;" id="fc-counter-label">Card 1 of 3</span>
-              <button class="btn btn-navy" onclick="nextFlashcard()">Next Card →</button>
-            </div>
-          </div>
-
-          <!-- TAB 5: SURGICAL REDLINES DIFF SANDBOX -->
-          <div id="studio-tab-redlines" class="studio-tab-content">
-            <div class="col-header-title" style="margin-bottom: 8px;">Surgical Legal Redlines</div>
-            
-            <div class="finding-card">
-              <div class="finding-title">Clause 3.0 Breach SLA Fix</div>
-              <div class="redline-box">
-                <del>within 120 hours of becoming aware</del> <ins>without undue delay and in any event within 24 hours of becoming aware</ins>
-              </div>
-              <div style="display: flex; gap: 6px; margin-top: 10px;">
-                <button class="btn btn-teal" style="font-size: 11px;" onclick="acceptRedline('r1')">✓ Accept Redline</button>
-                <button class="btn btn-outline" style="font-size: 11px;" onclick="rejectFinding('r1')">Reject</button>
-              </div>
-            </div>
-
-            <div class="finding-card">
-              <div class="finding-title">Clause 4.0 Liability Cap Fix</div>
-              <div class="redline-box">
-                <del>unlimited liability exposure without any financial cap</del> <ins>aggregate liability shall be capped at 12 months' total fees paid</ins>
-              </div>
-              <div style="display: flex; gap: 6px; margin-top: 10px;">
-                <button class="btn btn-teal" style="font-size: 11px;" onclick="acceptRedline('r2')">✓ Accept Redline</button>
-                <button class="btn btn-outline" style="font-size: 11px;" onclick="rejectFinding('r2')">Reject</button>
-              </div>
-            </div>
-          </div>
-
+        <div class="chat-input-box">
+          <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask a question or prompt cross-document reasoning..." onkeypress="handleChatKeyPress(event)">
+          <button class="btn btn-teal" onclick="sendChatMessage()">Send Prompt</button>
         </div>
       </div>
 
-    </div>
-
-    <!-- VIEW 2: DASHBOARD -->
-    <div id="view-dashboard" class="view-content">
-      <h2 class="display" style="font-size: 28px; color: var(--navy); margin-bottom: 16px;">Executive Compliance Dashboard</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Matter Title</th>
-            <th>Client</th>
-            <th>Jurisdiction</th>
-            <th>Risk Level</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="dashboard-matters-tbody">
-          <tr>
-            <td><strong>Supplier Vendor Onboarding — ABC Logistics</strong></td>
-            <td>Global Procurement Corp</td>
-            <td>South Africa</td>
-            <td><span class="chip chip-stop">HIGH RISK</span></td>
-            <td><span class="chip chip-clear">ACTIVE</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- VIEW 3: MATTERS -->
-    <div id="view-matters" class="view-content">
-      <h2 class="display" style="font-size: 28px; color: var(--navy);">Matters Portfolio</h2>
-    </div>
-
-    <!-- VIEW 4: RULES -->
-    <div id="view-rules" class="view-content">
-      <h2 class="display" style="font-size: 28px; color: var(--navy);">Rules & Statutory Source Registry</h2>
-    </div>
-
-    <!-- VIEW 5: TRACE -->
-    <div id="view-trace" class="view-content">
-      <h2 class="display" style="font-size: 28px; color: var(--navy);">Agent Trace Log & Observability</h2>
-    </div>
-
-    <!-- VIEW 6: ANALYTICS -->
-    <div id="view-analytics" class="view-content">
-      <h2 class="display" style="font-size: 28px; color: var(--navy);">Platform Operational Analytics</h2>
-    </div>
-
-  </div>
-
-  <!-- NOTEBOOK LM STYLE ADD SOURCES MODAL -->
-  <div class="modal-overlay" id="add-sources-modal">
-    <div class="sources-modal-card">
-      <div class="blue-blob color-blob"></div>
-      <div class="green-blob color-blob"></div>
-
-      <div class="modal-header">
-        <h2 class="modal-title">Create Audio Overviews, Mind Maps & Flashcards from <span class="highlight">your documents</span></h2>
-        <button class="btn-close-modal" onclick="closeAddSourcesModal()">✕</button>
-      </div>
-
-      <div class="modal-body">
-        <!-- Search the web box -->
-        <div class="modal-search-box">
-          <input type="text" id="modal-search-input" class="modal-input" placeholder="Search the web for new statutory rules or sources...">
-          <button class="btn btn-teal" style="border-radius: 6px; padding: 6px 12px;" onclick="triggerWebSourceSearch()">Search</button>
+      <!-- Document Reader with Highlight Settle -->
+      <div class="reader" id="reader-container">
+        <div class="reader-head">
+          <span class="mono">DOCUMENT READER — Supplier_Agreement.txt</span>
+          <span>Clause 3.0 Selected</span>
         </div>
-
-        <div style="font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; text-align: center;">or add your contract sources</div>
-
-        <!-- 4 Source Action Pills (NotebookLM Style) -->
-        <div class="source-action-pills-grid">
-          <button class="source-action-pill" onclick="triggerFileInput()">
-            <span class="pill-icon">📤</span>
-            <span class="pill-text">Upload files</span>
-            <span class="pill-sub">PDF, DOCX, TXT</span>
-          </button>
-
-          <button class="source-action-pill" onclick="promptAddWebSource()">
-            <span class="pill-icon">🔗</span>
-            <span class="pill-text">Websites</span>
-            <span class="pill-sub">URL Link</span>
-          </button>
-
-          <button class="source-action-pill" onclick="promptAddDriveSource()">
-            <span class="pill-icon">📁</span>
-            <span class="pill-text">Drive</span>
-            <span class="pill-sub">Google Drive</span>
-          </button>
-
-          <button class="source-action-pill" onclick="promptAddCopiedText()">
-            <span class="pill-icon">📋</span>
-            <span class="pill-text">Copied text</span>
-            <span class="pill-sub">Paste text</span>
-          </button>
+        <div class="reader-body" id="reader-body-content">
+          <div id="clause-text-1_0"><b>1. DEFINITIONS:</b> This Master Services Agreement is entered into under South African jurisdiction.</div>
+          <div id="clause-text-2_0" style="margin-top: 6px;"><b>2. OPERATOR SECURITY:</b> The Operator agrees to maintain data confidentiality per POPIA §21.</div>
+          <div id="clause-text-3_0" style="margin-top: 6px;"><b>3. SECURITY INCIDENT NOTIFICATION:</b> <mark id="mark-clause-3_0">Operator shall notify Responsible Party within 120 hours of becoming aware of a breach.</mark></div>
+          <div id="clause-text-4_0" style="margin-top: 6px;"><b>4. LIMITATION OF LIABILITY:</b> Supplier provides indemnity without financial cap.</div>
         </div>
       </div>
-    </div>
+
+      <!-- Persistent Agent Trace Dock (Transparency Layer) -->
+      <div class="trace-dock">
+        <div class="trace-head" onclick="toggleTraceExpand()">
+          <div class="trace-title">
+            <div class="pulse-dot"></div>
+            AGENT TRACE LOG & OBSERVABILITY FEED
+          </div>
+          <span style="font-size: 11px; color: var(--text-tertiary);" id="trace-toggle-arrow">▲ Expand Log</span>
+        </div>
+        <div class="trace-body" id="trace-feed">
+          <div class="trace-line">[18:00:01] IntakeAgent: classified 2 matter documents as CONTRACT / DPA (12.4ms)</div>
+          <div class="trace-line">[18:00:02] ExtractionAgent: segmented 5 spatial clause blocks (45.1ms)</div>
+          <div class="trace-line">[18:00:03] VerifierAgent: evaluated POPIA §22 — Clause 3.0 notice window: 3 VALID, 1 WRONG_SECTION (34.8ms)</div>
+          <div class="trace-line escalation">⚡ [18:00:04] EscalationAgent: Human-in-the-Loop review required for Clause 3.0 Breach SLA (15.0ms)</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL 3: STUDIO (Right, ~360px) -->
+    <aside class="studio" id="panel-studio">
+      <div class="studio-nav-tabs">
+        <div class="studio-tab active" onclick="switchStudioTab('report')">Report</div>
+        <div class="studio-tab" onclick="switchStudioTab('redlines')">Redlines</div>
+        <div class="studio-tab" onclick="switchStudioTab('mindmap')">Relationship Map</div>
+        <div class="studio-tab" onclick="switchStudioTab('audit')">Audit Export</div>
+      </div>
+
+      <div class="studio-body">
+
+        <!-- TAB 1: COMPLIANCE REPORT -->
+        <div id="studio-tab-report" class="studio-content-block active">
+          <div class="panel-title" style="margin-bottom: 10px;">Executive Compliance Memorandum</div>
+          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-secondary);">
+            <strong style="color: var(--text-primary);">Matter Audit Summary</strong><br>
+            Jurisdiction: South Africa (POPIA Act 4 of 2013)<br>
+            Compliance Score: <b style="color: var(--amber);">62%</b><br><br>
+            <b>Key Findings:</b>
+            <ul style="margin-left: 18px; margin-top: 6px;">
+              <li>Clause 3.0 120h SLA exceeds statutory max notice window.</li>
+              <li>Clause 4.0 contains uncapped indemnity liability exposure.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- TAB 2: SURGICAL REDLINES -->
+        <div id="studio-tab-redlines" class="studio-content-block">
+          <div class="panel-title" style="margin-bottom: 10px;">Surgical Redlines Sandbox</div>
+          <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
+            <b>Clause 3.0 SLA Amendment:</b><br>
+            <div class="mono" style="margin-top: 6px; padding: 8px; background: var(--bg); border-radius: 4px;">
+              <span style="color: var(--red); text-decoration: line-through;">within 120 hours of becoming aware</span> 
+              <span style="color: var(--clear); font-weight: 600;">without undue delay and in any event within 24 hours of becoming aware</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 10px;">
+              <button class="btn btn-teal" style="font-size: 11px;" onclick="acceptRedline('r1')">✓ Accept Redline</button>
+              <button class="btn btn-outline" style="font-size: 11px;" onclick="rejectRedline('r1')">Reject</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: RELATIONSHIP MAP (MARKMAP) -->
+        <div id="studio-tab-mindmap" class="studio-content-block">
+          <div class="panel-title" style="margin-bottom: 10px;">Contract Relationship Graph</div>
+          <div style="height: 320px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden;">
+            <svg id="markmap-canvas" style="width:100%; height:100%;"></svg>
+          </div>
+        </div>
+
+        <!-- TAB 4: AUDIT TRAIL EXPORT -->
+        <div id="studio-tab-audit" class="studio-content-block">
+          <div class="panel-title" style="margin-bottom: 10px;">Immutable Audit Record</div>
+          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
+            Every autonomous agent action and human sign-off is recorded with an immutable SHA-256 hash.
+            <br><br>
+            <button class="btn btn-teal" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
   </div>
 
   <script src="app.js"></script>

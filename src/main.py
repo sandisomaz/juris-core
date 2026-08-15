@@ -13,6 +13,7 @@ from src.api.rules import router as rules_router
 from src.api.reports import router as reports_router
 from src.api.audit import router as audit_router
 from src.api.analytics import router as analytics_router
+from src.api.events import router as events_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -40,6 +41,7 @@ app.include_router(rules_router)
 app.include_router(reports_router)
 app.include_router(audit_router)
 app.include_router(analytics_router)
+app.include_router(events_router)
 
 # Mount web UI static directory
 web_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web")
