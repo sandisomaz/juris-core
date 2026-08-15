@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "JurisCore"
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
-    PORT: int = 8000
+    PORT: int = 8888
     HOST: str = "0.0.0.0"
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./juris_core.db"
