@@ -1,4 +1,4 @@
-// JurisCore — Top Agent Reasoning Banner & Workspace Interaction Logic
+// JurisCore — Plain-Language Agent Reasoning & Clean Layout Logic
 
 let currentMatterId = "mat-001";
 let currentDocId = "doc-001";
@@ -69,7 +69,7 @@ function handleFileSelected(e) {
 }
 
 async function uploadBatchFiles(files) {
-  triggerAgentWork("Batch Document Classification & Intake");
+  triggerAgentWork("Document Processing & Intake");
   const formData = new FormData();
   formData.append("matter_id", currentMatterId);
   for (let i = 0; i < files.length; i++) {
@@ -129,7 +129,7 @@ async function scrollToClause(clauseId) {
   }
 }
 
-// --- 4. TOP AGENT THINKING & EXECUTION STREAM (FileFlow Style) ---
+// --- 4. PLAIN-LANGUAGE AGENT REASONING STREAM ---
 function triggerAgentWork(taskName) {
   const dot = document.getElementById("thinking-pulse-dot");
   const text = document.getElementById("thinking-status-text");
@@ -137,12 +137,12 @@ function triggerAgentWork(taskName) {
   if (!dot || !text) return;
 
   dot.classList.add("active");
-  text.innerText = `🧠 AGENT THINKING & REASONING: ${taskName.toUpperCase()}...`;
+  text.innerText = `🧠 EVALUATING LEGAL COMPLIANCE: ${taskName.toUpperCase()}...`;
 
   const time = new Date().toLocaleTimeString();
   const div = document.createElement("div");
   div.className = "thinking-step-line active-agent";
-  div.innerText = `[${time}] IntakeAgent -> ResearchAgent: reading and evaluating ${taskName}...`;
+  div.innerHTML = `📁 <b>Step:</b> Reading uploaded contracts & verifying ${taskName}...`;
   if (feed) {
     feed.appendChild(div);
     feed.scrollTop = feed.scrollHeight;
@@ -150,7 +150,7 @@ function triggerAgentWork(taskName) {
 
   setTimeout(() => {
     dot.classList.remove("active");
-    text.innerText = `✓ REASONING COMPLETED FOR: ${taskName.toUpperCase()}`;
+    text.innerText = `✓ COMPLIANCE CHECK COMPLETED FOR: ${taskName.toUpperCase()}`;
   }, 2200);
 }
 
@@ -218,14 +218,14 @@ function sendChatMessage() {
   const msg = input.value.trim();
   if (!msg) return;
 
-  triggerAgentWork(`Grounded Reasoning: ${msg}`);
+  triggerAgentWork(`Legal Reasoning: ${msg}`);
 
   const chatStream = document.getElementById("chat-stream");
   chatStream.innerHTML += `<div class="msg user">${msg}</div>`;
   input.value = "";
 
   setTimeout(() => {
-    let reply = `Cross-document evaluation complete. I've verified that Clause 3.0 requires notification within 120 hours, which conflicts with statutory POPIA §22 requirements <span class="cite wrong" onclick="scrollToClause('3_0')">POPIA §22 · WRONG_SECTION</span>.`;
+    let reply = `Evaluation complete. I've verified that Clause 3.0 requires notification within 120 hours, which exceeds statutory POPIA §22 requirements <span class="cite wrong" onclick="scrollToClause('3_0')">POPIA §22 · NON-COMPLIANT SLA</span>.`;
     if (msg.toLowerCase().includes("dpa")) {
       reply = `Cross-referencing DPA against Master Supplier Agreement confirms Section 3 of DPA aligns with POPIA §21 <span class="cite valid" onclick="scrollToClause('2_0')">POPIA §21 · VALID</span>.`;
     }
