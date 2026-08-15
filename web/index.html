@@ -3,218 +3,253 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JurisCore — Regulatory Intelligence Workspace</title>
+  <title>JurisCore — Regulatory Intelligence Shell</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Markmap Autoloader CDN for interactive contract relationship graph -->
   <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
 </head>
 <body>
 
-  <!-- Workspace Top Header -->
-  <header>
-    <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
-        <path d="M32 6 L52 14 V30 C52 44 43 53 32 58 C21 53 12 44 12 30 V14 L32 6Z" stroke="#002045" stroke-width="3" stroke-linejoin="round" fill="none"/>
-        <path d="M23 31 L29 37 L41 24" stroke="#006A63" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      </svg>
-      <span class="name">JurisCore</span>
-      <div class="matter">Matter: <b>ABC Logistics Vendor Onboarding & POPIA Audit</b></div>
-    </div>
+  <div id="app">
 
-    <!-- Panel Toggles -->
-    <div class="panel-toggles">
-      <button class="toggle-btn active" id="btn-toggle-left" onclick="togglePanel('left')" title="Toggle Sources Panel">📁 Sources</button>
-      <button class="toggle-btn active" id="btn-toggle-right" onclick="togglePanel('right')" title="Toggle Studio Panel">🎛️ Studio</button>
-      <button class="btn btn-navy" style="margin-left: 8px;" onclick="exportAuditTrail()">📥 Export Audit Trail</button>
-    </div>
-  </header>
-
-  <!-- 3-Panel Workspace Grid -->
-  <div class="workspace" id="workspace-grid">
-
-    <!-- PANEL 1: SOURCES (Left, ~280px) -->
-    <aside class="sources" id="panel-sources">
-      <div class="panel-head">
-        <div class="panel-title">Sources (<span id="sources-count-label">2</span>)</div>
-        <button class="btn btn-outline" style="padding: 2px 8px; font-size: 10px;" onclick="triggerFileInput()">+ Batch Add</button>
+    <!-- LEFT NAVIGATION RAIL (Collapsible) -->
+    <nav class="nav-rail" id="nav-rail">
+      <div class="rail-header">
+        <div class="rail-brand" onclick="startNewChat()">
+          <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
+            <path d="M32 6 L52 14 V30 C52 44 43 53 32 58 C21 53 12 44 12 30 V14 L32 6Z" stroke="#002045" stroke-width="3" stroke-linejoin="round" fill="none"/>
+            <path d="M23 31 L29 37 L41 24" stroke="#006A63" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="name">JurisCore</span>
+        </div>
+        <button class="btn-collapse-rail" onclick="toggleRail()" title="Toggle Sidebar">◀</button>
       </div>
 
-      <!-- Multi-File Drag-and-Drop Dropzone -->
-      <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
-        <b>Drop documents here</b>
-        Accepts PDF, DOCX, TXT up to 25MB
-        <input type="file" id="file-input" multiple style="display:none" onchange="handleFileSelected(event)">
+      <div class="new-chat-box">
+        <button class="btn-new-chat" onclick="startNewChat()">
+          <span>+</span> <span class="rail-item-text">New Chat</span>
+        </button>
       </div>
 
-      <!-- Source Card List with Processing Status Chips -->
-      <div class="source-list" id="source-list-container">
-        <div class="source-card selected" onclick="selectSource('doc-001')">
-          <div class="source-name">1. Supplier_Agreement.txt</div>
-          <div class="source-meta">
-            <span class="source-type">CONTRACT • 4.2 KB</span>
-            <span class="chip verified">VERIFIED</span>
-          </div>
+      <div class="rail-sections">
+        <div class="rail-section-title">History</div>
+        <div class="rail-item active" onclick="loadChat('c-001')">
+          <span class="rail-item-icon">💬</span>
+          <span class="rail-item-text">ABC Logistics Audit</span>
+        </div>
+        <div class="rail-item" onclick="loadChat('c-002')">
+          <span class="rail-item-icon">📌</span>
+          <span class="rail-item-text">POPIA Section 22 Inquiry</span>
         </div>
 
-        <div class="source-card" onclick="selectSource('doc-002')">
-          <div class="source-name">2. Data_Processing_DPA.txt</div>
-          <div class="source-meta">
-            <span class="source-type">DPA • 2.8 KB</span>
-            <span class="chip review">NEEDS REVIEW</span>
-          </div>
+        <div class="rail-section-title">Matters (Projects)</div>
+        <div class="rail-item" onclick="loadMatter('m-001')">
+          <span class="rail-item-icon">📁</span>
+          <span class="rail-item-text">Vendor Procurement Onboarding</span>
         </div>
-      </div>
 
-      <!-- Clause Hierarchy DOM Section -->
-      <div class="clause-tree-section">
-        <div class="panel-title" style="margin-bottom: 8px;">Extracted Clause DOM</div>
-        <div id="clause-tree-list">
-          <div class="clause-tree-item" onclick="scrollToClause('1_0')">
-            <span>1. DEFINITIONS</span>
-            <span class="chip verified">VALID</span>
-          </div>
-          <div class="clause-tree-item" onclick="scrollToClause('2_0')">
-            <span>2. OPERATOR SECURITY</span>
-            <span class="chip verified">VALID</span>
-          </div>
-          <div class="clause-tree-item" onclick="scrollToClause('3_0')">
-            <span>3. BREACH SLA TIMELINE</span>
-            <span class="chip review">WRONG_SECTION</span>
-          </div>
-          <div class="clause-tree-item" onclick="scrollToClause('4_0')">
-            <span>4. LIMITATION OF LIABILITY</span>
-            <span class="chip checking">UNCAPPED</span>
-          </div>
+        <div class="rail-section-title">Artifacts</div>
+        <div class="rail-item" onclick="openArtifact('report')">
+          <span class="rail-item-icon">📄</span>
+          <span class="rail-item-text">Compliance Memos</span>
+        </div>
+        <div class="rail-item" onclick="openArtifact('redlines')">
+          <span class="rail-item-icon">✂️</span>
+          <span class="rail-item-text">Surgical Redlines</span>
+        </div>
+        <div class="rail-item" onclick="openArtifact('audit')">
+          <span class="rail-item-icon">📥</span>
+          <span class="rail-item-text">Audit Trail Logs</span>
         </div>
       </div>
-    </aside>
+    </nav>
 
-    <!-- PANEL 2: WORKSPACE (Center, Primary Focus) -->
-    <main class="ws-col" id="panel-workspace">
-      
-      <!-- TOP PLAIN-LANGUAGE AGENT REASONING BANNER (FileFlow / Claude Style) -->
-      <div class="agent-thinking-banner" id="thinking-banner">
-        <div class="thinking-banner-head" onclick="toggleThinkingExpand()">
-          <div class="thinking-status-label">
-            <div class="thinking-pulse-dot" id="thinking-pulse-dot"></div>
-            <span id="thinking-status-text">🧠 AI ASSISTANT REASONING STREAM • READY</span>
-          </div>
-          <span style="font-size: 11px; color: var(--text-tertiary);" id="thinking-toggle-arrow">▲ Collapse Steps</span>
-        </div>
-        <div class="thinking-steps-stream" id="thinking-steps-feed">
-          <div class="thinking-step-line">📁 <b>Step 1:</b> Reading uploaded contracts & organizing clause structure</div>
-          <div class="thinking-step-line">📜 <b>Step 2:</b> Cross-referencing South African POPIA statutory rules (§19, §21, §22)</div>
-          <div class="thinking-step-line">⚖️ <b>Step 3:</b> Verifying breach SLA timeline (120h notice window exceeds statutory limit)</div>
-          <div class="thinking-step-line escalation">⚡ <b>Step 4:</b> Flagged 2 items requiring human-in-the-loop counsel review</div>
-        </div>
-      </div>
+    <!-- MAIN WORKSPACE AREA -->
+    <div class="main-content">
 
-      <!-- Grounded Chat Conversation Stream -->
-      <div class="chat" id="chat-stream">
-        <div class="msg ai">
-          <div class="ai-body">
-            I have completed the legal compliance evaluation for this matter across all <strong>2 sources</strong>. 
-            I found 2 key items for you to look at:
-            <br><br>
-            1. <strong>Defective Incident Notification Window</strong>: Clause 3.0 specifies a 120-hour notice SLA, which exceeds statutory requirements <span class="cite wrong" onclick="scrollToClause('3_0')">POPIA §22 · NON-COMPLIANT SLA</span>.
-            <br><br>
-            2. <strong>Uncapped Liability Exposure</strong>: Clause 4.0 provides an indemnity with unlimited financial exposure <span class="cite outdated" onclick="scrollToClause('4_0')">Clause 4.0 · UNCAPPED RISK</span>.
-          </div>
-        </div>
-      </div>
-
-      <!-- Chat Bar & Action Prompt Suggestions -->
-      <div class="chat-input-container">
-        <div class="prompt-chips-bar">
-          <div class="prompt-chip" onclick="clickPromptChip('Cross-reference DPA against Master Supplier Agreement')">🔄 Cross-Reference DPA</div>
-          <div class="prompt-chip" onclick="clickPromptChip('Check POPIA §22 statutory breach SLA requirements')">⚖️ Verify POPIA §22</div>
-          <div class="prompt-chip" onclick="clickPromptChip('Generate surgical redline for Clause 3.0 SLA')">✍️ Draft SLA Redline</div>
+      <!-- TOP HEADER BAR -->
+      <header class="top-bar">
+        <div class="active-matter-title">
+          <span>Matter:</span> <b>ABC Logistics Vendor Onboarding & POPIA Audit</b>
+          <span class="workspace-state-badge" id="layout-state-badge">CONVERSATION STATE (2 COLUMNS)</span>
         </div>
 
-        <div class="chat-input-box">
-          <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask a question or prompt cross-document reasoning..." onkeypress="handleChatKeyPress(event)">
-          <button class="btn btn-teal" onclick="sendChatMessage()">Send Prompt</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline" id="btn-toggle-workspace" onclick="toggleWorkspaceColumn()">🎛️ Workspace View</button>
+          <button class="btn btn-navy" onclick="exportAuditTrail()">📥 Export Audit Log</button>
         </div>
-      </div>
+      </header>
 
-      <!-- Document Reader with Highlight Settle -->
-      <div class="reader" id="reader-container">
-        <div class="reader-head">
-          <span class="mono">DOCUMENT READER — Supplier_Agreement.txt</span>
-          <span>Clause 3.0 Selected</span>
-        </div>
-        <div class="reader-body" id="reader-body-content">
-          <div id="clause-text-1_0"><b>1. DEFINITIONS:</b> This Master Services Agreement is entered into under South African jurisdiction.</div>
-          <div id="clause-text-2_0" style="margin-top: 6px;"><b>2. OPERATOR SECURITY:</b> The Operator agrees to maintain data confidentiality per POPIA §21.</div>
-          <div id="clause-text-3_0" style="margin-top: 6px;"><b>3. SECURITY INCIDENT NOTIFICATION:</b> <mark id="mark-clause-3_0">Operator shall notify Responsible Party within 120 hours of becoming aware of a breach.</mark></div>
-          <div id="clause-text-4_0" style="margin-top: 6px;"><b>4. LIMITATION OF LIABILITY:</b> Supplier provides indemnity without financial cap.</div>
-        </div>
-      </div>
+      <!-- WORKSPACE SPLIT CONTAINER -->
+      <div class="workspace-split">
 
-    </main>
+        <!-- CENTER CHAT COLUMN (Primary Focus) -->
+        <main class="center-chat-column">
 
-    <!-- PANEL 3: STUDIO (Right, ~360px) -->
-    <aside class="studio" id="panel-studio">
-      <div class="studio-nav-tabs">
-        <div class="studio-tab active" onclick="switchStudioTab('report')">Report</div>
-        <div class="studio-tab" onclick="switchStudioTab('redlines')">Redlines</div>
-        <div class="studio-tab" onclick="switchStudioTab('mindmap')">Relationship Map</div>
-        <div class="studio-tab" onclick="switchStudioTab('audit')">Audit Export</div>
-      </div>
-
-      <div class="studio-body">
-
-        <!-- TAB 1: COMPLIANCE REPORT -->
-        <div id="studio-tab-report" class="studio-content-block active">
-          <div class="panel-title" style="margin-bottom: 10px;">Executive Compliance Memorandum</div>
-          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-primary);">
-            <strong style="color: var(--navy);">Matter Audit Summary</strong><br>
-            Jurisdiction: South Africa (POPIA Act 4 of 2013)<br>
-            Compliance Score: <b style="color: var(--amber);">62%</b><br><br>
-            <b>Key Findings:</b>
-            <ul style="margin-left: 18px; margin-top: 6px;">
-              <li>Clause 3.0 120h SLA exceeds statutory max notice window.</li>
-              <li>Clause 4.0 contains uncapped indemnity liability exposure.</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- TAB 2: SURGICAL REDLINES -->
-        <div id="studio-tab-redlines" class="studio-content-block">
-          <div class="panel-title" style="margin-bottom: 10px;">Surgical Redlines Sandbox</div>
-          <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
-            <b>Clause 3.0 SLA Amendment:</b><br>
-            <div class="mono" style="margin-top: 6px; padding: 8px; background: var(--surface-card); border-radius: 4px; border: 1px solid var(--border-dark);">
-              <span style="color: var(--red); text-decoration: line-through;">within 120 hours of becoming aware</span> 
-              <span style="color: var(--clear); font-weight: 600;">without undue delay and in any event within 24 hours of becoming aware</span>
+          <!-- TOP PLAIN-LANGUAGE AGENT REASONING STREAM BANNER -->
+          <div class="agent-thinking-banner" id="thinking-banner">
+            <div class="thinking-banner-head" onclick="toggleThinkingExpand()">
+              <div class="thinking-status-label">
+                <div class="thinking-pulse-dot" id="thinking-pulse-dot"></div>
+                <span id="thinking-status-text">🧠 AI ASSISTANT REASONING STREAM • READY</span>
+              </div>
+              <span style="font-size: 11px; color: var(--text-tertiary);" id="thinking-toggle-arrow">▲ Collapse Steps</span>
             </div>
-            <div style="display: flex; gap: 6px; margin-top: 10px;">
-              <button class="btn btn-teal" style="font-size: 11px;" onclick="acceptRedline('r1')">✓ Accept Redline</button>
-              <button class="btn btn-outline" style="font-size: 11px;" onclick="rejectRedline('r1')">Reject</button>
+            <div class="thinking-steps-stream" id="thinking-steps-feed">
+              <div class="thinking-step-line">📁 <b>Step 1:</b> Ingested 2 contract sources for ABC Logistics matter</div>
+              <div class="thinking-step-line">📜 <b>Step 2:</b> Evaluated POPIA Section 19, Section 21, and Section 22 rules</div>
+              <div class="thinking-step-line">⚖️ <b>Step 3:</b> Flagged 120h breach SLA timeline exceeding statutory max limit</div>
+              <div class="thinking-step-line escalation">⚡ <b>Step 4:</b> Human-in-the-Loop review required for Clause 3.0</div>
             </div>
           </div>
-        </div>
 
-        <!-- TAB 3: RELATIONSHIP MAP (MARKMAP) -->
-        <div id="studio-tab-mindmap" class="studio-content-block">
-          <div class="panel-title" style="margin-bottom: 10px;">Contract Relationship Graph</div>
-          <div style="height: 320px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden;">
-            <svg id="markmap-canvas" style="width:100%; height:100%;"></svg>
-          </div>
-        </div>
+          <!-- CHAT MESSAGES STREAM -->
+          <div class="chat-stream" id="chat-stream">
+            <div class="msg ai">
+              <div class="ai-body">
+                Welcome to <strong>JurisCore</strong>. Ask a quick compliance question, or prompt multi-step contract review to automatically open the full Workspace.
+                <br><br>
+                I have completed the legal compliance evaluation for this matter across all <strong>2 sources</strong>. 
+                I found 2 key items requiring attention:
+                <br><br>
+                1. <strong>Defective Breach SLA</strong>: Clause 3.0 notice window exceeds statutory limits <span class="cite wrong" onclick="openWorkspaceTab('sources', '3_0')">POPIA §22 · WRONG_SECTION</span>.
+                <br><br>
+                2. <strong>Uncapped Liability</strong>: Clause 4.0 contains unlimited financial liability <span class="cite outdated" onclick="openWorkspaceTab('sources', '4_0')">Clause 4.0 · UNCAPPED</span>.
 
-        <!-- TAB 4: AUDIT TRAIL EXPORT -->
-        <div id="studio-tab-audit" class="studio-content-block">
-          <div class="panel-title" style="margin-bottom: 10px;">Immutable Audit Record</div>
-          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; color: var(--text-primary);">
-            Every autonomous agent action and human sign-off is recorded with an immutable SHA-256 hash.
-            <br><br>
-            <button class="btn btn-navy" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
+                <!-- Generated Artifact Attachment Cards -->
+                <div class="chat-attachment-card" onclick="openWorkspaceTab('report')">
+                  <span class="attachment-icon">📄</span>
+                  <div>
+                    <div class="attachment-title">Executive Compliance Memorandum v1.pdf</div>
+                    <div class="attachment-sub">Click to inspect matter compliance report & findings</div>
+                  </div>
+                </div>
+
+                <div class="chat-attachment-card" onclick="openWorkspaceTab('redlines')">
+                  <span class="attachment-icon">✂️</span>
+                  <div>
+                    <div class="attachment-title">Clause 3.0 Surgical Redline SLA Amendment</div>
+                    <div class="attachment-sub">Click to inspect and accept/reject proposed redlines</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <!-- CHAT INPUT & PROMPT SUGGESTION CHIPS -->
+          <div class="chat-input-bar">
+            <div class="prompt-chips-bar">
+              <div class="prompt-chip" onclick="clickPromptChip('Review this contract and open workspace')">🔍 Review Contract & Open Workspace</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Cross-reference DPA against Master Supplier Agreement')">🔄 Cross-Reference DPA</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Check POPIA §22 statutory breach SLA requirements')">⚖️ Verify POPIA §22</div>
+            </div>
+
+            <div class="chat-input-box">
+              <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask a question or type 'review this contract' to open workspace..." onkeypress="handleChatKeyPress(event)">
+              <button class="btn btn-teal" onclick="sendChatMessage()">Send Prompt</button>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- RIGHT WORKSPACE COLUMN (3rd Column - Slides in on Work Trigger) -->
+        <aside class="right-workspace-column hidden" id="right-workspace-column">
+          
+          <!-- Workspace Tab Navigation -->
+          <div class="ws-tab-bar">
+            <div class="ws-tab active" onclick="switchWsTab('sources')">Sources (2)</div>
+            <div class="ws-tab" onclick="switchWsTab('report')">Report</div>
+            <div class="ws-tab" onclick="switchWsTab('redlines')">Redlines</div>
+            <div class="ws-tab" onclick="switchWsTab('mindmap')">Relationship Map</div>
+            <div class="ws-tab" onclick="switchWsTab('audit')">Audit Export</div>
+          </div>
+
+          <div class="ws-body">
+
+            <!-- TAB 1: SOURCES & DOCUMENT READER -->
+            <div id="ws-tab-sources" class="ws-tab-content active">
+              <div class="sources-dropzone" onclick="triggerFileInput()">
+                <b>Drop contract documents here</b>
+                Batch upload PDF, DOCX, TXT up to 25MB
+                <input type="file" id="file-input" multiple style="display:none" onchange="handleFileSelected(event)">
+              </div>
+
+              <div id="sources-list-container">
+                <div class="source-item-card">
+                  <span>1. Supplier_Agreement.txt</span>
+                  <span class="chip verified">VERIFIED</span>
+                </div>
+                <div class="source-item-card">
+                  <span>2. Data_Processing_DPA.txt</span>
+                  <span class="chip review">NEEDS REVIEW</span>
+                </div>
+              </div>
+
+              <div class="panel-title" style="margin: 14px 0 8px;">Document Reader — Supplier_Agreement.txt</div>
+              <div class="reader-box" id="reader-content-box">
+                <div id="clause-text-1_0"><b>1. DEFINITIONS:</b> Entered into under South African jurisdiction.</div>
+                <div id="clause-text-2_0" style="margin-top: 6px;"><b>2. OPERATOR SECURITY:</b> Data confidentiality per POPIA §21.</div>
+                <div id="clause-text-3_0" style="margin-top: 6px;"><b>3. INCIDENT NOTIFICATION:</b> <mark>Operator shall notify Responsible Party within 120 hours of breach.</mark></div>
+                <div id="clause-text-4_0" style="margin-top: 6px;"><b>4. INDEMNITY:</b> Supplier provides indemnity without financial cap.</div>
+              </div>
+            </div>
+
+            <!-- TAB 2: COMPLIANCE REPORT -->
+            <div id="ws-tab-report" class="ws-tab-content">
+              <div class="panel-title" style="margin-bottom: 10px;">Executive Compliance Memorandum</div>
+              <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-primary);">
+                <strong style="color: var(--navy);">Matter Audit Summary</strong><br>
+                Jurisdiction: South Africa (POPIA Act 4 of 2013)<br>
+                Compliance Score: <b style="color: var(--amber);">62%</b><br><br>
+                <b>Key Findings:</b>
+                <ul style="margin-left: 18px; margin-top: 6px;">
+                  <li>Clause 3.0 120h SLA exceeds statutory max notice window.</li>
+                  <li>Clause 4.0 contains uncapped indemnity liability exposure.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- TAB 3: SURGICAL REDLINES -->
+            <div id="ws-tab-redlines" class="ws-tab-content">
+              <div class="panel-title" style="margin-bottom: 10px;">Surgical Redlines Sandbox</div>
+              <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
+                <b>Clause 3.0 SLA Amendment:</b><br>
+                <div class="mono" style="margin-top: 6px; padding: 8px; background: var(--surface-card); border-radius: 4px; border: 1px solid var(--border-dark);">
+                  <span style="color: var(--red); text-decoration: line-through;">within 120 hours of becoming aware</span> 
+                  <span style="color: var(--clear); font-weight: 600;">without undue delay and in any event within 24 hours of becoming aware</span>
+                </div>
+                <div style="display: flex; gap: 6px; margin-top: 10px;">
+                  <button class="btn btn-teal" style="font-size: 11px;" onclick="acceptRedline('r1')">✓ Accept Redline</button>
+                  <button class="btn btn-outline" style="font-size: 11px;" onclick="rejectRedline('r1')">Reject</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 4: RELATIONSHIP MAP (MARKMAP) -->
+            <div id="ws-tab-mindmap" class="ws-tab-content">
+              <div class="panel-title" style="margin-bottom: 10px;">Contract Relationship Graph</div>
+              <div style="height: 320px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden;">
+                <svg id="markmap-canvas" style="width:100%; height:100%;"></svg>
+              </div>
+            </div>
+
+            <!-- TAB 5: AUDIT EXPORT -->
+            <div id="ws-tab-audit" class="ws-tab-content">
+              <div class="panel-title" style="margin-bottom: 10px;">Immutable Audit Record</div>
+              <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; color: var(--text-primary);">
+                Every autonomous agent action and human sign-off is recorded with an immutable SHA-256 hash.
+                <br><br>
+                <button class="btn btn-navy" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
+              </div>
+            </div>
+
+          </div>
+
+        </aside>
 
       </div>
-    </aside>
+
+    </div>
 
   </div>
 
