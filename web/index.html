@@ -92,21 +92,20 @@
     <!-- PANEL 2: WORKSPACE (Center, Primary Focus) -->
     <main class="ws-col" id="panel-workspace">
       
-      <!-- TOP AGENT THINKING & EXECUTION STREAM BANNER (FileFlow / Claude Style) -->
+      <!-- TOP PLAIN-LANGUAGE AGENT REASONING BANNER (FileFlow / Claude Style) -->
       <div class="agent-thinking-banner" id="thinking-banner">
         <div class="thinking-banner-head" onclick="toggleThinkingExpand()">
           <div class="thinking-status-label">
             <div class="thinking-pulse-dot" id="thinking-pulse-dot"></div>
-            <span id="thinking-status-text">🧠 AGENT REASONING STREAM • READY</span>
+            <span id="thinking-status-text">🧠 AI ASSISTANT REASONING STREAM • READY</span>
           </div>
           <span style="font-size: 11px; color: var(--text-tertiary);" id="thinking-toggle-arrow">▲ Collapse Steps</span>
         </div>
         <div class="thinking-steps-stream" id="thinking-steps-feed">
-          <div class="thinking-step-line">[18:00:01] IntakeAgent: classified 2 matter documents as CONTRACT / DPA (12.4ms)</div>
-          <div class="thinking-step-line">[18:00:02] ExtractionAgent: segmented 5 spatial clause blocks (45.1ms)</div>
-          <div class="thinking-step-line">[18:00:03] ResearchAgent: cross-referenced POPIA §19-22 statutory rules (88.0ms)</div>
-          <div class="thinking-step-line">[18:00:04] VerifierAgent: checked 4 citations — 3 VALID, 1 WRONG_SECTION (34.8ms)</div>
-          <div class="thinking-step-line escalation">⚡ [18:00:05] EscalationAgent: Human-in-the-Loop review checkpoint triggered for Clause 3.0</div>
+          <div class="thinking-step-line">📁 <b>Step 1:</b> Reading uploaded contracts & organizing clause structure</div>
+          <div class="thinking-step-line">📜 <b>Step 2:</b> Cross-referencing South African POPIA statutory rules (§19, §21, §22)</div>
+          <div class="thinking-step-line">⚖️ <b>Step 3:</b> Verifying breach SLA timeline (120h notice window exceeds statutory limit)</div>
+          <div class="thinking-step-line escalation">⚡ <b>Step 4:</b> Flagged 2 items requiring human-in-the-loop counsel review</div>
         </div>
       </div>
 
@@ -114,12 +113,12 @@
       <div class="chat" id="chat-stream">
         <div class="msg ai">
           <div class="ai-body">
-            I have completed the multi-agent compliance evaluation for this matter across all <strong>2 sources</strong>. 
-            I found 2 critical discrepancies:
+            I have completed the legal compliance evaluation for this matter across all <strong>2 sources</strong>. 
+            I found 2 key items for you to look at:
             <br><br>
-            1. <strong>Defective Incident Notification Window</strong>: Clause 3.0 specifies a 120-hour notice SLA, which fails the statutory requirements of <span class="cite wrong" onclick="scrollToClause('3_0')">POPIA §22 · WRONG_SECTION</span>.
+            1. <strong>Defective Incident Notification Window</strong>: Clause 3.0 specifies a 120-hour notice SLA, which exceeds statutory requirements <span class="cite wrong" onclick="scrollToClause('3_0')">POPIA §22 · NON-COMPLIANT SLA</span>.
             <br><br>
-            2. <strong>Uncapped Liability Exposure</strong>: Clause 4.0 provides an indemnity with unlimited financial exposure <span class="cite outdated" onclick="scrollToClause('4_0')">Clause 4.0 · UNCAPPED</span>.
+            2. <strong>Uncapped Liability Exposure</strong>: Clause 4.0 provides an indemnity with unlimited financial exposure <span class="cite outdated" onclick="scrollToClause('4_0')">Clause 4.0 · UNCAPPED RISK</span>.
           </div>
         </div>
       </div>
@@ -207,7 +206,7 @@
         <!-- TAB 4: AUDIT TRAIL EXPORT -->
         <div id="studio-tab-audit" class="studio-content-block">
           <div class="panel-title" style="margin-bottom: 10px;">Immutable Audit Record</div>
-          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12px; color: var(--text-primary);">
+          <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; color: var(--text-primary);">
             Every autonomous agent action and human sign-off is recorded with an immutable SHA-256 hash.
             <br><br>
             <button class="btn btn-navy" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
