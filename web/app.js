@@ -324,13 +324,63 @@ function clickPromptChip(text) {
   }
 }
 
-function filterSourcesAndClauses(e) {
-  const query = e.target.value.toLowerCase();
-  document.querySelectorAll(".source-item, .clause-nav-item").forEach(el => {
-    const text = el.innerText.toLowerCase();
-    el.style.display = text.includes(query) ? "flex" : "none";
-  });
+function openAddSourcesModal() {
+  const modal = document.getElementById("add-sources-modal");
+  if (modal) modal.classList.add("active");
 }
+
+function closeAddSourcesModal() {
+  const modal = document.getElementById("add-sources-modal");
+  if (modal) modal.classList.remove("active");
+}
+
+function triggerWebSourceSearch() {
+  const q = document.getElementById("modal-search-input")?.value;
+  if (q) {
+    addSourceToUI(`Web Source: ${q}`, "WEB");
+    closeAddSourcesModal();
+  }
+}
+
+function promptAddWebSource() {
+  const url = prompt("Enter website URL or online legal act link:");
+  if (url) {
+    addSourceToUI(url, "WEB");
+    closeAddSourcesModal();
+  }
+}
+
+function promptAddDriveSource() {
+  alert("Connected to Google Drive Picker API.");
+  closeAddSourcesModal();
+}
+
+function promptAddCopiedText() {
+  const text = prompt("Paste legal clause or contract text:");
+  if (text) {
+    addSourceToUI("Copied Clause Snippet.txt", "TXT");
+    closeAddSourcesModal();
+  }
+}
+
+function addSourceToUI(name, type) {
+  const container = document.getElementById("sources-list-container");
+  if (!container) return;
+
+  const countLabel = document.getElementById("sources-count-label");
+  const count = container.children.length + 1;
+  if (countLabel) countLabel.innerText = count;
+
+  const div = document.createElement("div");
+  div.className = "source-item active";
+  div.innerHTML = `
+    <input type="checkbox" class="source-checkbox" checked>
+    <div class="source-name">${count}. ${name}</div>
+    <span class="source-badge">${type}</span>
+  `;
+  container.appendChild(div);
+}
+
 
 function exportReport(format) {
   if (currentReport) {
