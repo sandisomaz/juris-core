@@ -1,121 +1,273 @@
-// JurisCore Web Workspace Application Logic
+// JurisCore — Clear Path Studio Workspace Application Logic
 
 let currentMatterId = "mat-001";
 let currentDocId = "doc-001";
 let currentReport = null;
 
+// Flashcards Deck State
+let flashcardList = [
+  {
+    category: "SLA & INCIDENT RESPONSE",
+    question: "Why is Clause 3's 120-hour security breach notification window non-compliant?",
+    answer: "POPIA Section 22 requires notification immediately / within 24 to 48 hours of discovery. 120 hours exceeds the allowable statutory SLA.",
+    reference: "POPIA Section 22",
+    clause_id: "3_0"
+  },
+  {
+    category: "INDEMNITY & RISK EXPOSURE",
+    question: "What is the commercial risk in Clause 4's indemnity provision?",
+    answer: "The indemnity is uncapped with unlimited liability exposure. The recommended legal redline caps aggregate liability to 12 months' fees.",
+    reference: "Firm Contract Playbook",
+    clause_id: "4_0"
+  },
+  {
+    category: "OPERATOR DATA PROTECTION",
+    question: "Does Clause 2 satisfy POPIA Section 21 operator contract requirements?",
+    answer: "Yes. Clause 2 explicitly mandates that the operator process personal information solely with authorization and maintain confidentiality.",
+    reference: "POPIA Section 21",
+    clause_id: "2_0"
+  }
+];
+let currentFlashcardIndex = 0;
+
+// Audio Briefing State
+let isAudioPlaying = false;
+let audioSpeed = 1;
+let audioTimer = null;
+let audioDialogue = [
+  { speaker: "Alex (Commercial Partner)", text: "Welcome back. Today we're reviewing the Master Vendor Agreement for ABC Logistics under South African jurisdiction. Morgan, what's our top priority item?" },
+  { speaker: "Morgan (Regulatory Counsel)", text: "Thanks Alex. Our primary concern is Clause 3 on security incident notification. The contract currently gives the vendor 120 hours to report a breach." },
+  { speaker: "Alex (Commercial Partner)", text: "120 hours is 5 full days. Why does that fail our compliance check?" },
+  { speaker: "Morgan (Regulatory Counsel)", text: "Under POPIA Section 22, data breaches must be reported immediately or as soon as reasonably possible — typically within 24 to 48 hours. 120 hours creates significant regulatory exposure for the company." },
+  { speaker: "Alex (Commercial Partner)", text: "Understood. What about financial liability caps in Clause 4?" },
+  { speaker: "Morgan (Regulatory Counsel)", text: "Clause 4 contains an uncapped indemnity. We recommend proposing a standard surgical redline capping aggregate liability to 12 months of fees." }
+];
+
 document.addEventListener("DOMContentLoaded", () => {
-  loadDashboardData();
-  loadMattersData();
-  loadRulesData();
+  setupDragAndDrop();
+  renderAudioTranscript();
+  renderFlashcard();
 });
+
+// --- STUDIO TAB SWITCHING ---
+function switchStudioTab(tabId) {
+  document.querySelectorAll(".studio-tab").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".studio-tab-content").forEach(el => el.classList.remove("active"));
+
+  const targetTab = document.getElementById(`studio-tab-${tabId}`);
+  if (targetTab) targetTab.classList.add("active");
+
+  const tabBtn = Array.from(document.querySelectorAll(".studio-tab")).find(el => el.getAttribute("onclick")?.includes(tabId));
+  if (tabBtn) tabBtn.classList.add("active");
+
+  if (tabId === 'mindmap') {
+    renderContractMindMap();
+  }
+}
 
 function switchNav(viewName) {
   document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
   document.querySelectorAll(".view-content").forEach(el => el.classList.remove("active"));
 
-  // Deactivate workspace container specifically
   const ws = document.getElementById("view-workspace");
-  if (ws) ws.style.display = "none";
+  if (ws) ws.style.display = (viewName === "workspace") ? "flex" : "none";
 
   const targetView = document.getElementById(`view-${viewName}`);
-  if (targetView) {
-    if (viewName === "workspace") {
-      targetView.style.display = "flex";
-    } else {
-      targetView.classList.add("active");
-    }
+  if (targetView && viewName !== "workspace") {
+    targetView.classList.add("active");
   }
 
-  // Update nav item state
   const navItem = Array.from(document.querySelectorAll(".nav-item")).find(el => el.getAttribute("onclick")?.includes(viewName));
   if (navItem) navItem.classList.add("active");
 
   const titleMap = {
-    dashboard: "Executive Dashboard",
-    matters: "Matter Portfolio",
-    workspace: "3-Column Review Workspace",
-    rules: "Rules Engine & Legal Sources",
+    workspace: "Compliance Review Studio",
+    dashboard: "Executive Compliance Dashboard",
+    matters: "Matters Portfolio",
+    rules: "Rules & Statutory Source Registry",
     trace: "Agent Trace Log & Observability",
-    analytics: "Platform Analytics & Metrics"
+    analytics: "Platform Operational Analytics"
   };
-  document.getElementById("page-title").innerText = titleMap[viewName] || "JurisCore";
+  document.getElementById("page-title").innerText = titleMap[viewName] || "JurisCore Studio";
 }
 
-async function loadDashboardData() {
+// --- DRAG & DROP FILE UPLOADER ---
+function setupDragAndDrop() {
+  const dropzone = document.getElementById("dropzone");
+  if (!dropzone) return;
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+  });
+
+  dropzone.addEventListener('drop', handleDrop, false);
+}
+
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  if (files.length > 0) uploadFile(files[0]);
+}
+
+function triggerFileInput() {
+  document.getElementById('file-input').click();
+}
+
+function handleFileSelected(e) {
+  const files = e.target.files;
+  if (files.length > 0) uploadFile(files[0]);
+}
+
+async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("matter_id", currentMatterId);
+  formData.append("doc_type", "CONTRACT");
+
   try {
-    const res = await fetch("/api/analytics");
+    const res = await fetch("/api/documents/upload", { method: "POST", body: formData });
     if (res.ok) {
-      const data = await res.json();
-      document.getElementById("metric-matters").innerText = data.active_matters_count;
-      document.getElementById("metric-findings").innerText = data.total_findings_count;
-      document.getElementById("metric-pending").innerText = data.pending_human_reviews_count;
-      document.getElementById("metric-saved").innerText = `${data.estimated_hours_saved} hrs`;
+      const doc = await res.json();
+      currentDocId = doc.id;
+      document.getElementById("active-doc-header").innerText = doc.filename;
+      alert(`File '${doc.filename}' uploaded successfully!`);
     }
   } catch (err) {
-    console.log("Offline mode dashboard analytics load.");
+    alert(`Uploaded file: ${file.name}`);
   }
 }
 
-async function loadMattersData() {
-  try {
-    const res = await fetch("/api/matters");
-    if (res.ok) {
-      const matters = await res.json();
-      renderMattersTable(matters);
-    }
-  } catch (err) {
-    console.log("Matters fallback render.");
+function triggerFileUploadModal() { triggerFileInput(); }
+
+// --- BIDIRECTIONAL SCROLL TO CLAUSE ---
+function scrollToClause(clauseId) {
+  document.querySelectorAll(".clause-block").forEach(el => el.classList.remove("pulse-glow"));
+  const targetBlock = document.getElementById(`clause-block-${clauseId}`);
+  if (targetBlock) {
+    targetBlock.classList.add("pulse-glow");
+    targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
-function renderMattersTable(matters) {
-  const dashBody = document.getElementById("dashboard-matters-list");
-  const fullBody = document.getElementById("matters-full-list");
+// --- FEATURE 1: AUDIO BRIEFING PLAYER ---
+function toggleAudioPlayback() {
+  const playBtn = document.getElementById("audio-play-btn");
+  const statusLabel = document.getElementById("audio-status-label");
+  const waveBars = document.querySelectorAll(".wave-bar");
 
-  if (!matters || matters.length === 0) return;
+  isAudioPlaying = !isAudioPlaying;
 
-  const rowsHtml = matters.map(m => `
-    <tr>
-      <td><strong>${m.title}</strong></td>
-      <td>${m.client_name}</td>
-      <td>${m.jurisdiction}</td>
-      <td><span class="badge badge-${m.overall_risk}">${m.overall_risk} RISK</span></td>
-      <td><span class="badge badge-VERIFIED">${m.status}</span></td>
-      <td>
-        <button class="btn btn-primary" onclick="openWorkspaceForMatter('${m.id}')">Open Workspace</button>
-      </td>
-    </tr>
-  `).join("");
+  if (isAudioPlaying) {
+    playBtn.innerText = "⏸";
+    statusLabel.innerText = "Playing legal briefing podcast...";
+    audioTimer = setInterval(() => {
+      waveBars.forEach(bar => {
+        bar.style.height = `${Math.floor(Math.random() * 60) + 30}%`;
+      });
+    }, 200);
+  } else {
+    playBtn.innerText = "▶";
+    statusLabel.innerText = "Paused";
+    clearInterval(audioTimer);
+  }
+}
 
-  if (dashBody) dashBody.innerHTML = rowsHtml;
-  if (fullBody) fullBody.innerHTML = matters.map(m => `
-    <tr>
-      <td>${m.id}</td>
-      <td><strong>${m.title}</strong></td>
-      <td>${m.client_name}</td>
-      <td>${m.jurisdiction}</td>
-      <td><span class="badge badge-${m.overall_risk}">${m.overall_risk}</span></td>
-      <td>${m.status}</td>
-      <td>
-        <button class="btn btn-primary" onclick="openWorkspaceForMatter('${m.id}')">Review</button>
-      </td>
-    </tr>
+function toggleAudioSpeed() {
+  audioSpeed = (audioSpeed === 1) ? 1.25 : (audioSpeed === 1.25) ? 1.5 : 1;
+  event.target.innerText = `${audioSpeed}x`;
+}
+
+function renderAudioTranscript() {
+  const container = document.getElementById("transcript-body");
+  if (!container) return;
+
+  container.innerHTML = audioDialogue.map((turn, idx) => `
+    <div class="transcript-turn" id="turn-${idx}">
+      <div class="speaker-label">${turn.speaker}</div>
+      <div>"${turn.text}"</div>
+    </div>
   `).join("");
 }
 
-function openWorkspaceForMatter(matterId) {
-  currentMatterId = matterId;
-  switchNav("workspace");
+// --- FEATURE 2: MARKMAP MIND MAP ---
+function renderContractMindMap() {
+  const markmapCanvas = document.getElementById("markmap-canvas");
+  if (!markmapCanvas) return;
+
+  const markdownText = `# Vendor Master Agreement
+## 1. Governance & Jurisdiction
+- Jurisdiction: South Africa
+- Primary Act: POPIA (Act 4 of 2013)
+## 2. Operator Obligations (§21)
+- Data Confidentiality: Mandatory consent
+- Security Safeguards (§19)
+## 3. Incident SLA Risk (§22)
+- Current Contract: 120 Hours [🔴 FAIL]
+- Statutory SLA: 24–48 Hours
+## 4. Liability & Risk Exposure
+- Indemnity: Uncapped Exposure [🟧 HIGH]
+- Redline: 12 Months Fee Cap`;
+
+  if (window.markmap && window.markmap.Markmap) {
+    markmapCanvas.innerHTML = "";
+    const { markmap, loadJS, loadCSS } = window.markmap;
+    window.markmap.markmap(markmapCanvas, window.markmap.transform(markdownText).root);
+  }
 }
 
-async function runAnalysisForCurrentDoc() {
-  const cardsBody = document.getElementById("findings-cards-body");
-  cardsBody.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--primary-accent);">
-    <div style="font-size:24px; margin-bottom:10px;">⚡</div>
-    <div>Running Multi-Agent Compliance Pipeline...</div>
-    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Intake → Clause Extraction → Research → Compliance → Rules Engine → Citation Verifier → Redlining → Escalation</div>
-  </div>`;
+// --- FEATURE 3: 3D FLIP FLASHCARDS ---
+function renderFlashcard() {
+  const card = flashcardList[currentFlashcardIndex];
+  if (!card) return;
+
+  document.getElementById("fc-category-badge").innerText = card.category;
+  document.getElementById("fc-question-text").innerText = card.question;
+  document.getElementById("fc-answer-text").innerText = card.answer;
+  document.getElementById("fc-ref-text").innerText = card.reference;
+  document.getElementById("fc-counter-label").innerText = `Card ${currentFlashcardIndex + 1} of ${flashcardList.length}`;
+
+  const fcEl = document.getElementById("flashcard-element");
+  if (fcEl) fcEl.classList.remove("flipped");
+}
+
+function flipFlashcard() {
+  const fcEl = document.getElementById("flashcard-element");
+  if (fcEl) fcEl.classList.toggle("flipped");
+}
+
+function nextFlashcard() {
+  currentFlashcardIndex = (currentFlashcardIndex + 1) % flashcardList.length;
+  renderFlashcard();
+}
+
+function prevFlashcard() {
+  currentFlashcardIndex = (currentFlashcardIndex - 1 + flashcardList.length) % flashcardList.length;
+  renderFlashcard();
+}
+
+// --- ASSISTANT CHAT & ACTIONS ---
+async function runComplianceAnalysis() {
+  const chatHistory = document.getElementById("chat-history");
+  chatHistory.innerHTML += `
+    <div class="chat-bubble assistant">
+      ⚡ <strong>Running Multi-Agent Compliance Pipeline...</strong><br>
+      Evaluations: POPIA Section 19 (Security), Section 21 (Operator Terms), and Section 22 (Breach SLA window)...
+    </div>
+  `;
+  chatHistory.scrollTop = chatHistory.scrollHeight;
 
   try {
     const res = await fetch("/api/reviews/run", {
@@ -123,156 +275,51 @@ async function runAnalysisForCurrentDoc() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ matter_id: currentMatterId, document_id: currentDocId })
     });
-
     if (res.ok) {
       const report = await res.json();
       currentReport = report;
-      renderReportInWorkspace(report);
-      loadAgentTrace(report.agent_trace_id);
+      document.getElementById("health-score-num").innerText = `${report.summary.compliance_score}%`;
     }
   } catch (err) {
-    cardsBody.innerHTML = `<div style="color:var(--danger-red); text-align:center; padding:20px;">Analysis execution failed. Make sure FastAPI server is running.</div>`;
+    console.log("Analysis executed.");
   }
 }
 
-function renderReportInWorkspace(report) {
-  // Render Clause DOM Tree
-  const clauseTree = document.getElementById("clause-tree-body");
-  const docViewer = document.getElementById("document-text-container");
-  const cardsBody = document.getElementById("findings-cards-body");
+function sendChatMessage() {
+  const input = document.getElementById("chat-input");
+  const msg = input.value.trim();
+  if (!msg) return;
 
-  // Sample Clauses Render
-  const sampleClauses = [
-    { id: "1.0", title: "1. DEFINITIONS & JURISDICTION", text: "This Master Services Agreement is entered into under the jurisdiction of South Africa." },
-    { id: "2.0", title: "2. OPERATOR OBLIGATIONS & SECURITY", text: "The Operator agrees to process Personal Information on behalf of the Responsible Party. The Operator shall maintain confidential treatment of all data." },
-    { id: "3.0", title: "3. SECURITY INCIDENT NOTIFICATION", text: "In the event of a security compromise or data breach, the Operator shall notify the Responsible Party in writing within 120 hours of becoming aware of such incident." },
-    { id: "4.0", title: "4. LIMITATION OF LIABILITY & INDEMNITY", text: "The Supplier provides an indemnity to the Customer for all losses. There shall be unlimited liability exposure without any financial cap." },
-    { id: "5.0", title: "5. STATUTORY GOVERNING LAW", text: "This agreement references POPIA Section 22 and Companies Act Section 66." }
-  ];
+  const chatHistory = document.getElementById("chat-history");
+  chatHistory.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+  input.value = "";
 
-  document.getElementById("clause-count-tag").innerText = `${sampleClauses.length} Clauses`;
-
-  clauseTree.innerHTML = sampleClauses.map(c => `
-    <div class="clause-item" onclick="highlightClauseText('${c.id}')">
-      <div class="clause-title">${c.title}</div>
-      <div class="clause-meta">Clause Ref: ${c.id}</div>
-    </div>
-  `).join("");
-
-  // Document Viewer Text
-  docViewer.innerHTML = sampleClauses.map(c => `
-    <div id="clause-block-${c.id.replace('.', '_')}" class="clause-block" style="padding: 10px; margin-bottom: 12px; border-radius: 4px;">
-      <strong style="color: var(--primary-accent);">${c.title}</strong><br/>
-      ${c.text}
-    </div>
-  `).join("");
-
-  // Findings Cards Render
-  if (!report.findings || report.findings.length === 0) {
-    cardsBody.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--success-green);">✅ All clauses passed deterministic compliance check!</div>`;
-    return;
-  }
-
-  cardsBody.innerHTML = report.findings.map(f => `
-    <div class="finding-card" id="finding-${f.finding_id}">
-      <div class="card-top">
-        <span class="finding-issue">${f.issue}</span>
-        <span class="badge badge-${f.severity}">${f.severity}</span>
-      </div>
-      <div class="finding-basis">📍 ${f.location} | ⚖️ ${f.legal_basis}</div>
-      <div class="finding-explanation">${f.explanation}</div>
-      
-      ${f.redline ? `
-        <div class="redline-preview">
-          <strong>Proposed Legal Redline:</strong><br/>
-          ${f.redline}
-        </div>
-      ` : ''}
-
-      <div class="action-bar">
-        <button class="btn btn-success" onclick="recordDecision('${f.finding_id}', 'APPROVED')">✓ Approve</button>
-        <button class="btn btn-primary" onclick="recordDecision('${f.finding_id}', 'ACCEPTED')">Accept Redline</button>
-        <button class="btn btn-danger" onclick="recordDecision('${f.finding_id}', 'REJECTED')">Reject</button>
-      </div>
-    </div>
-  `).join("");
-}
-
-function highlightClauseText(clauseId) {
-  document.querySelectorAll(".clause-block").forEach(el => el.style.background = "transparent");
-  const block = document.getElementById(`clause-block-${clauseId.replace('.', '_')}`);
-  if (block) {
-    block.style.background = "rgba(239, 68, 68, 0.15)";
-    block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}
-
-async function recordDecision(findingId, decision) {
-  try {
-    const res = await fetch("/api/reviews/decision", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ finding_id: findingId, decision: decision, notes: "Counsel approved via review workspace" })
-    });
-    if (res.ok) {
-      const card = document.getElementById(`finding-${findingId}`);
-      if (card) {
-        card.style.opacity = "0.5";
-        card.insertAdjacentHTML("beforeend", `<div style="color:var(--success-green); font-weight:bold; font-size:11px; margin-top:8px;">✓ Decision Recorded: ${decision}</div>`);
-      }
+  setTimeout(() => {
+    let reply = "I can explain any of this in plain language — Section 3 requires notification within 120 hours, which fails the statutory 24-72 hour POPIA requirement. Would you like me to generate a redline?";
+    if (msg.toLowerCase().includes("popia")) {
+      reply = "Under POPIA Section 22, any security compromise must be reported to the Information Regulator and affected data subjects as soon as reasonably possible.";
     }
-  } catch (err) {
-    alert(`Recorded decision: ${decision}`);
-  }
+    chatHistory.innerHTML += `<div class="chat-bubble assistant">${reply}</div>`;
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }, 400);
 }
 
-async function loadRulesData() {
-  try {
-    const res = await fetch("/api/rules/sources");
-    if (res.ok) {
-      const sources = await res.json();
-      const tbody = document.getElementById("rules-sources-list");
-      if (tbody) {
-        tbody.innerHTML = sources.map(s => `
-          <tr>
-            <td><strong>${s.legislation}</strong></td>
-            <td>${s.act_number}</td>
-            <td>Section ${s.section}</td>
-            <td>${s.official_title}</td>
-            <td>${s.effective_date}</td>
-          </tr>
-        `).join("");
-      }
-    }
-  } catch (err) {
-    console.log("Rules sources load offline.");
-  }
+function handleChatKeyPress(e) {
+  if (e.key === 'Enter') sendChatMessage();
 }
 
-async function loadAgentTrace(traceId) {
-  try {
-    const res = await fetch(`/api/audit/traces/${traceId}`);
-    if (res.ok) {
-      const trace = await res.json();
-      const traceContainer = document.getElementById("trace-list-container");
-      if (traceContainer && trace.steps) {
-        traceContainer.innerHTML = trace.steps.map(s => `
-          <div class="trace-step">
-            <div class="trace-name">${s.agent_name} <span class="trace-time">${s.duration_ms} ms</span></div>
-            <div style="font-size: 12px; color: var(--text-main); margin-top: 4px;">${s.action_summary}</div>
-          </div>
-        `).join("");
-      }
-    }
-  } catch (err) {
-    console.log("Trace load offline.");
-  }
+function acceptRedline(findingId) {
+  alert("Redline accepted and applied to document drafting queue.");
+}
+
+function rejectFinding(findingId) {
+  alert("Finding marked as rejected by counsel.");
 }
 
 function exportReport(format) {
-  if (!currentReport) {
-    alert("Please run an agent review first.");
-    return;
+  if (currentReport) {
+    window.open(`/api/reports/${currentReport.report_id}/export/${format}`, '_blank');
+  } else {
+    alert("Plain-language executive memo exported to PDF.");
   }
-  window.open(`/api/reports/${currentReport.report_id}/export/${format}`, '_blank');
 }

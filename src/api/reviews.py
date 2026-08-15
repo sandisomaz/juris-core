@@ -8,6 +8,7 @@ from src.domain.audit import AgentRunTrace, AuditEvent
 from src.api.documents import IN_MEMORY_DOCUMENTS, RAW_DOC_CONTENTS
 from src.deterministic.scoring import compliance_scorer
 from src.domain.reports import ComplianceReport, ReviewSummary
+from src.agents.studio_agents import studio_generators, AudioBriefing, Flashcard
 
 router = APIRouter(prefix="/api/reviews", tags=["Reviews"])
 
@@ -118,3 +119,20 @@ async def record_human_decision(req: HumanDecisionRequest):
     )
     IN_MEMORY_AUDIT_LOGS.append(audit_evt)
     return finding
+
+@router.get("/studio/audio", response_model=AudioBriefing)
+async def get_audio_briefing():
+    findings = list(IN_MEMORY_FINDINGS.values())
+    return studio_generators.generate_audio_briefing(findings)
+
+@router.get("/studio/mindmap")
+async def get_mindmap():
+    findings = list(IN_MEMORY_FINDINGS.values())
+    markdown_str = studio_generators.generate_mindmap_markdown(findings)
+    return {"markdown": markdown_str}
+
+@router.get("/studio/flashcards", response_model=List[Flashcard])
+async def get_flashcards():
+    findings = list(IN_MEMORY_FINDINGS.values())
+    return studio_generators.generate_flashcards(findings)
+
