@@ -91,6 +91,25 @@
 
     <!-- PANEL 2: WORKSPACE (Center, Primary Focus) -->
     <main class="ws-col" id="panel-workspace">
+      
+      <!-- TOP AGENT THINKING & EXECUTION STREAM BANNER (FileFlow / Claude Style) -->
+      <div class="agent-thinking-banner" id="thinking-banner">
+        <div class="thinking-banner-head" onclick="toggleThinkingExpand()">
+          <div class="thinking-status-label">
+            <div class="thinking-pulse-dot" id="thinking-pulse-dot"></div>
+            <span id="thinking-status-text">🧠 AGENT REASONING STREAM • READY</span>
+          </div>
+          <span style="font-size: 11px; color: var(--text-tertiary);" id="thinking-toggle-arrow">▲ Collapse Steps</span>
+        </div>
+        <div class="thinking-steps-stream" id="thinking-steps-feed">
+          <div class="thinking-step-line">[18:00:01] IntakeAgent: classified 2 matter documents as CONTRACT / DPA (12.4ms)</div>
+          <div class="thinking-step-line">[18:00:02] ExtractionAgent: segmented 5 spatial clause blocks (45.1ms)</div>
+          <div class="thinking-step-line">[18:00:03] ResearchAgent: cross-referenced POPIA §19-22 statutory rules (88.0ms)</div>
+          <div class="thinking-step-line">[18:00:04] VerifierAgent: checked 4 citations — 3 VALID, 1 WRONG_SECTION (34.8ms)</div>
+          <div class="thinking-step-line escalation">⚡ [18:00:05] EscalationAgent: Human-in-the-Loop review checkpoint triggered for Clause 3.0</div>
+        </div>
+      </div>
+
       <!-- Grounded Chat Conversation Stream -->
       <div class="chat" id="chat-stream">
         <div class="msg ai">
@@ -133,22 +152,6 @@
         </div>
       </div>
 
-      <!-- Persistent Agent Trace Dock (Active Only When Work Is Happening) -->
-      <div class="trace-dock">
-        <div class="trace-head" onclick="toggleTraceExpand()">
-          <div class="trace-title">
-            <div class="pulse-dot" id="trace-pulse-dot"></div>
-            <span id="trace-status-text">AGENT TRACE LOG • IDLE (CLICK TO EXPAND)</span>
-          </div>
-          <span style="font-size: 11px; color: var(--text-tertiary);" id="trace-toggle-arrow">▲ Expand Log</span>
-        </div>
-        <div class="trace-body" id="trace-feed">
-          <div class="trace-line">[18:00:01] IntakeAgent: classified 2 matter documents as CONTRACT / DPA (12.4ms)</div>
-          <div class="trace-line">[18:00:02] ExtractionAgent: segmented 5 spatial clause blocks (45.1ms)</div>
-          <div class="trace-line">[18:00:03] VerifierAgent: evaluated POPIA §22 — Clause 3.0 notice window: 3 VALID, 1 WRONG_SECTION (34.8ms)</div>
-          <div class="trace-line escalation">⚡ [18:00:04] EscalationAgent: Human-in-the-Loop review required for Clause 3.0 Breach SLA (15.0ms)</div>
-        </div>
-      </div>
     </main>
 
     <!-- PANEL 3: STUDIO (Right, ~360px) -->

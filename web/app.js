@@ -1,8 +1,7 @@
-// JurisCore — Clean Light Paper Theme & Conditional Agent Trace Logic
+// JurisCore — Top Agent Reasoning Banner & Workspace Interaction Logic
 
 let currentMatterId = "mat-001";
 let currentDocId = "doc-001";
-let isPipelineRunning = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   setupDragAndDrop();
@@ -70,7 +69,7 @@ function handleFileSelected(e) {
 }
 
 async function uploadBatchFiles(files) {
-  triggerAgentWork("Batch Upload & Classification");
+  triggerAgentWork("Batch Document Classification & Intake");
   const formData = new FormData();
   formData.append("matter_id", currentMatterId);
   for (let i = 0; i < files.length; i++) {
@@ -130,20 +129,20 @@ async function scrollToClause(clauseId) {
   }
 }
 
-// --- 4. CONDITIONAL AGENT TRACE (ACTIVE ONLY WHEN WORK IS HAPPENING) ---
+// --- 4. TOP AGENT THINKING & EXECUTION STREAM (FileFlow Style) ---
 function triggerAgentWork(taskName) {
-  const dot = document.getElementById("trace-pulse-dot");
-  const text = document.getElementById("trace-status-text");
-  const feed = document.getElementById("trace-feed");
+  const dot = document.getElementById("thinking-pulse-dot");
+  const text = document.getElementById("thinking-status-text");
+  const feed = document.getElementById("thinking-steps-feed");
   if (!dot || !text) return;
 
   dot.classList.add("active");
-  text.innerText = `⚡ RUNNING MULTI-AGENT PIPELINE: ${taskName.toUpperCase()}...`;
+  text.innerText = `🧠 AGENT THINKING & REASONING: ${taskName.toUpperCase()}...`;
 
   const time = new Date().toLocaleTimeString();
   const div = document.createElement("div");
-  div.className = "trace-line";
-  div.innerText = `[${time}] IntakeAgent -> VerificationAgent: starting ${taskName}...`;
+  div.className = "thinking-step-line active-agent";
+  div.innerText = `[${time}] IntakeAgent -> ResearchAgent: reading and evaluating ${taskName}...`;
   if (feed) {
     feed.appendChild(div);
     feed.scrollTop = feed.scrollHeight;
@@ -151,21 +150,21 @@ function triggerAgentWork(taskName) {
 
   setTimeout(() => {
     dot.classList.remove("active");
-    text.innerText = `✓ PIPELINE EXECUTION COMPLETED FOR: ${taskName.toUpperCase()}`;
-  }, 2500);
+    text.innerText = `✓ REASONING COMPLETED FOR: ${taskName.toUpperCase()}`;
+  }, 2200);
 }
 
-function toggleTraceExpand() {
-  const traceFeed = document.getElementById("trace-feed");
-  const arrow = document.getElementById("trace-toggle-arrow");
-  if (!traceFeed) return;
+function toggleThinkingExpand() {
+  const feed = document.getElementById("thinking-steps-feed");
+  const arrow = document.getElementById("thinking-toggle-arrow");
+  if (!feed || !arrow) return;
 
-  if (traceFeed.style.maxHeight === "300px") {
-    traceFeed.style.maxHeight = "140px";
-    arrow.innerText = "▲ Expand Log";
+  if (feed.style.display === "none") {
+    feed.style.display = "block";
+    arrow.innerText = "▲ Collapse Steps";
   } else {
-    traceFeed.style.maxHeight = "300px";
-    arrow.innerText = "▼ Collapse Log";
+    feed.style.display = "none";
+    arrow.innerText = "▼ Expand Steps";
   }
 }
 

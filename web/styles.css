@@ -23,25 +23,10 @@
   --clear-soft: rgba(20, 108, 46, 0.14);
   --clear-tint: #e6f5ea;
   --gray: #74777f;
-  --gray-soft: rgba(116, 119, 127, 0.12);
 
   --font-display: 'Newsreader', serif;
   --font-body: 'Atkinson Hyperlegible Next', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
-}
-
-/* System Dark Theme Override */
-@media (prefers-color-scheme: dark) {
-  :root.auto-theme {
-    --bg: #041531;
-    --surface: #0b2a52;
-    --surface-card: #123765;
-    --border: #1f4270;
-    --border-dark: #2a5288;
-    --text-primary: #faf9fd;
-    --text-secondary: #9fb0c8;
-    --text-tertiary: #6e80a0;
-  }
 }
 
 * {
@@ -284,6 +269,83 @@ header {
   background: var(--bg);
 }
 
+/* TOP AGENT THINKING & EXECUTION STREAM BANNER (FileFlow / Claude Style) */
+.agent-thinking-banner {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-card);
+  transition: all 0.2s ease;
+}
+
+.thinking-banner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  cursor: pointer;
+  background: var(--surface);
+}
+
+.thinking-status-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.thinking-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray);
+}
+
+.thinking-pulse-dot.active {
+  background: var(--teal);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.25); }
+  100% { opacity: 0.3; transform: scale(0.9); }
+}
+
+.thinking-steps-stream {
+  padding: 10px 16px;
+  max-height: 150px;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  background: var(--surface-card);
+}
+
+.thinking-step-line {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.thinking-step-line.active-agent {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.thinking-step-line.escalation {
+  color: var(--amber);
+  background: var(--amber-tint);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Chat Stream */
 .chat {
   flex: 1;
   overflow-y: auto;
@@ -419,74 +481,6 @@ header {
   font-weight: 600;
   padding: 1px 4px;
   border-radius: 3px;
-}
-
-/* Agent Trace Dock (Only Active When Work Happens) */
-.trace-dock {
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.trace-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 16px;
-  cursor: pointer;
-}
-
-.trace-title {
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-}
-
-.pulse-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--gray);
-}
-
-.pulse-dot.active {
-  background: var(--teal);
-  animation: pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.3; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 0.3; transform: scale(0.9); }
-}
-
-.trace-body {
-  max-height: 140px;
-  overflow-y: auto;
-  padding: 8px 16px 12px;
-  border-top: 1px solid var(--border);
-  background: var(--surface-card);
-}
-
-.trace-line {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-  display: flex;
-  gap: 8px;
-}
-
-.trace-line.escalation {
-  color: var(--amber);
-  background: var(--amber-tint);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 600;
 }
 
 /* ---- Studio Panel (Right, 360px) ---- */
