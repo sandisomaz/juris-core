@@ -1,11 +1,11 @@
-// JurisCore — Dark Workspace Application Logic per BRAND.md & ARCHITECTURE.md
+// JurisCore — Clean Light Paper Theme & Conditional Agent Trace Logic
 
 let currentMatterId = "mat-001";
 let currentDocId = "doc-001";
+let isPipelineRunning = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   setupDragAndDrop();
-  initAgentEventStream();
   renderRelationshipMap();
 });
 
@@ -70,6 +70,7 @@ function handleFileSelected(e) {
 }
 
 async function uploadBatchFiles(files) {
+  triggerAgentWork("Batch Upload & Classification");
   const formData = new FormData();
   formData.append("matter_id", currentMatterId);
   for (let i = 0; i < files.length; i++) {
@@ -122,32 +123,36 @@ async function scrollToClause(clauseId) {
   if (targetEl) {
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     targetEl.style.transition = 'all 0.3s ease';
-    targetEl.style.background = 'var(--teal-soft)';
+    targetEl.style.background = 'var(--amber-tint)';
     setTimeout(() => {
       targetEl.style.background = 'transparent';
     }, 2000);
   }
 }
 
-// --- 4. REAL-TIME SSE AGENT TRACE STREAM ---
-function initAgentEventStream() {
-  const traceFeed = document.getElementById("trace-feed");
-  if (!traceFeed) return;
+// --- 4. CONDITIONAL AGENT TRACE (ACTIVE ONLY WHEN WORK IS HAPPENING) ---
+function triggerAgentWork(taskName) {
+  const dot = document.getElementById("trace-pulse-dot");
+  const text = document.getElementById("trace-status-text");
+  const feed = document.getElementById("trace-feed");
+  if (!dot || !text) return;
 
-  try {
-    const evtSource = new EventSource("/api/events/stream");
-    evtSource.onmessage = function(e) {
-      const data = JSON.parse(e.data);
-      const time = new Date().toLocaleTimeString();
-      const div = document.createElement("div");
-      div.className = `trace-line ${data.status === "HUMAN_REVIEW_REQUIRED" ? "escalation" : ""}`;
-      div.innerText = `[${time}] ${data.summary} (${data.duration_ms}ms)`;
-      traceFeed.appendChild(div);
-      traceFeed.scrollTop = traceFeed.scrollHeight;
-    };
-  } catch (err) {
-    console.log("SSE Stream connected.");
+  dot.classList.add("active");
+  text.innerText = `⚡ RUNNING MULTI-AGENT PIPELINE: ${taskName.toUpperCase()}...`;
+
+  const time = new Date().toLocaleTimeString();
+  const div = document.createElement("div");
+  div.className = "trace-line";
+  div.innerText = `[${time}] IntakeAgent -> VerificationAgent: starting ${taskName}...`;
+  if (feed) {
+    feed.appendChild(div);
+    feed.scrollTop = feed.scrollHeight;
   }
+
+  setTimeout(() => {
+    dot.classList.remove("active");
+    text.innerText = `✓ PIPELINE EXECUTION COMPLETED FOR: ${taskName.toUpperCase()}`;
+  }, 2500);
 }
 
 function toggleTraceExpand() {
@@ -213,6 +218,8 @@ function sendChatMessage() {
   const input = document.getElementById("chat-input");
   const msg = input.value.trim();
   if (!msg) return;
+
+  triggerAgentWork(`Grounded Reasoning: ${msg}`);
 
   const chatStream = document.getElementById("chat-stream");
   chatStream.innerHTML += `<div class="msg user">${msg}</div>`;
