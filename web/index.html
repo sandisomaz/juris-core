@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JurisCore — Plain-Language Legal Studio</title>
+  <title>JurisCore — Clear Path Compliance Studio</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Markmap Autoloader CDN for interactive contract mind mapping -->
   <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
@@ -57,7 +57,7 @@
           <div class="status-dot"></div>
           100% DETERMINISTIC VERIFIED
         </div>
-        <button class="btn btn-navy" onclick="triggerFileUploadModal()">+ Add Sources</button>
+        <button class="btn btn-navy" onclick="openAddSourcesModal()">+ Add Sources</button>
       </div>
     </header>
 
@@ -67,8 +67,8 @@
       <!-- COLUMN 1: SOURCES & CLAUSE DOM -->
       <div class="studio-col col-sources">
         <div class="col-header">
-          <div class="col-header-title">Sources (2)</div>
-          <button class="btn btn-outline" style="padding: 2px 8px; font-size: 10px;" onclick="triggerFileUploadModal()">+ Add</button>
+          <div class="col-header-title">Sources (<span id="sources-count-label">2</span>)</div>
+          <button class="btn btn-outline" style="padding: 2px 8px; font-size: 10px;" onclick="openAddSourcesModal()">+ Add</button>
         </div>
         
         <div class="col-body">
@@ -83,16 +83,18 @@
           </div>
 
           <!-- Sources List -->
-          <div class="source-item active">
-            <input type="checkbox" class="source-checkbox" checked>
-            <div class="source-name">1. Supplier_Agreement.txt</div>
-            <span class="source-badge">TXT</span>
-          </div>
+          <div id="sources-list-container">
+            <div class="source-item active">
+              <input type="checkbox" class="source-checkbox" checked>
+              <div class="source-name">1. Supplier_Agreement.txt</div>
+              <span class="source-badge">TXT</span>
+            </div>
 
-          <div class="source-item">
-            <input type="checkbox" class="source-checkbox" checked>
-            <div class="source-name">2. Data_Processing_DPA.txt</div>
-            <span class="source-badge">TXT</span>
+            <div class="source-item">
+              <input type="checkbox" class="source-checkbox" checked>
+              <div class="source-name">2. Data_Processing_DPA.txt</div>
+              <span class="source-badge">TXT</span>
+            </div>
           </div>
 
           <!-- Clause DOM Tree -->
@@ -469,6 +471,56 @@
       <h2 class="display" style="font-size: 28px; color: var(--navy);">Platform Operational Analytics</h2>
     </div>
 
+  </div>
+
+  <!-- NOTEBOOK LM STYLE ADD SOURCES MODAL -->
+  <div class="modal-overlay" id="add-sources-modal">
+    <div class="sources-modal-card">
+      <div class="blue-blob color-blob"></div>
+      <div class="green-blob color-blob"></div>
+
+      <div class="modal-header">
+        <h2 class="modal-title">Create Audio Overviews, Mind Maps & Flashcards from <span class="highlight">your documents</span></h2>
+        <button class="btn-close-modal" onclick="closeAddSourcesModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Search the web box -->
+        <div class="modal-search-box">
+          <input type="text" id="modal-search-input" class="modal-input" placeholder="Search the web for new statutory rules or sources...">
+          <button class="btn btn-teal" style="border-radius: 6px; padding: 6px 12px;" onclick="triggerWebSourceSearch()">Search</button>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; text-align: center;">or add your contract sources</div>
+
+        <!-- 4 Source Action Pills (NotebookLM Style) -->
+        <div class="source-action-pills-grid">
+          <button class="source-action-pill" onclick="triggerFileInput()">
+            <span class="pill-icon">📤</span>
+            <span class="pill-text">Upload files</span>
+            <span class="pill-sub">PDF, DOCX, TXT</span>
+          </button>
+
+          <button class="source-action-pill" onclick="promptAddWebSource()">
+            <span class="pill-icon">🔗</span>
+            <span class="pill-text">Websites</span>
+            <span class="pill-sub">URL Link</span>
+          </button>
+
+          <button class="source-action-pill" onclick="promptAddDriveSource()">
+            <span class="pill-icon">📁</span>
+            <span class="pill-text">Drive</span>
+            <span class="pill-sub">Google Drive</span>
+          </button>
+
+          <button class="source-action-pill" onclick="promptAddCopiedText()">
+            <span class="pill-icon">📋</span>
+            <span class="pill-text">Copied text</span>
+            <span class="pill-sub">Paste text</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
