@@ -59,6 +59,9 @@ ENV/
 *.sqlite3
 juris_core.db
 
+# Research & Reference Codebases
+Research/
+
 # IDEs & Editors
 .vscode/
 .idea/
