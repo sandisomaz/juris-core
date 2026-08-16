@@ -11,7 +11,8 @@ class DocumentValidator:
         if content_size > self.MAX_FILE_SIZE_BYTES:
             raise DocumentParsingException(f"File size {content_size} bytes exceeds maximum allowed limit of {self.MAX_FILE_SIZE_BYTES} bytes.")
 
-        ext = "." + filename.split(".")[-1].lower() if "." in filename else ""
+        import pathlib
+        ext = pathlib.Path(filename).suffix.lower()
         if ext not in self.ALLOWED_EXTENSIONS:
             raise DocumentParsingException(f"Unsupported file extension '{ext}'. Allowed extensions: {', '.join(self.ALLOWED_EXTENSIONS)}.")
 
