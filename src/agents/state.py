@@ -20,6 +20,8 @@ class WorkflowState(BaseModel):
     ai_findings: List[Finding] = Field(default_factory=list)
     deterministic_findings: List[Finding] = Field(default_factory=list)
     final_findings: List[Finding] = Field(default_factory=list)
+    privilege_flag: Optional[Dict[str, Any]] = None
+    deadline_flags: List[Dict[str, Any]] = Field(default_factory=list)
     human_review_required: bool = False
     step_traces: List[AgentStepTrace] = Field(default_factory=list)
     current_step: str = "INITIATED"

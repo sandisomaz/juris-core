@@ -33,6 +33,8 @@ class Finding(BaseModel):
     explanation: str = Field(..., description="Detailed rationale explaining the finding")
     recommended_action: str = Field(..., description="Actionable recommendation for legal counsel")
     redline: Optional[str] = Field(None, description="Proposed replacement text / redline")
+    related_sources: list[str] = Field(default_factory=list, description="IDs or filenames of related matter sources")
+    conflicting_clause_ids: list[str] = Field(default_factory=list, description="Clause IDs that conflict with this finding")
     verification_status: VerificationStatus = VerificationStatus.UNCERTAIN_HUMAN_REVIEW
     human_decision: HumanDecision = HumanDecision.PENDING
     reviewer_notes: Optional[str] = None

@@ -17,14 +17,21 @@ IN_MEMORY_TRACES: Dict[str, AgentRunTrace] = {}
 IN_MEMORY_AUDIT_LOGS: List[AuditEvent] = []
 IN_MEMORY_REPORTS: Dict[str, ComplianceReport] = {}
 
+
 class StartReviewRequest(BaseModel):
     matter_id: str
     document_id: str
+
+
+class StartMatterReviewRequest(BaseModel):
+    matter_id: str
+
 
 class HumanDecisionRequest(BaseModel):
     finding_id: str
     decision: HumanDecision
     notes: Optional[str] = None
+
 
 @router.post("/run", response_model=ComplianceReport)
 async def run_review(req: StartReviewRequest):
@@ -92,11 +99,51 @@ This agreement references POPIA Section 22 and Companies Act Section 66.
     IN_MEMORY_REPORTS[report_id] = report
     return report
 
+
+@router.post("/matter/run", response_model=ComplianceReport)
+async def run_matter_review(req: StartMatterReviewRequest):
+    """Executes a unified cross-document compliance review across all documents in a matter."""
+    matter_docs = [d for d in IN_MEMORY_DOCUMENTS if d.matter_id == req.matter_id]
+    if not matter_docs:
+        matter_docs = IN_MEMORY_DOCUMENTS
+
+    state, trace = supervisor_orchestrator.run_matter_workflow(
+        matter_id=req.matter_id,
+        documents=matter_docs,
+        raw_contents=RAW_DOC_CONTENTS
+    )
+
+    IN_MEMORY_TRACES[trace.trace_id] = trace
+
+    for f in state.final_findings:
+        IN_MEMORY_FINDINGS[f.finding_id] = f
+
+    summary = compliance_scorer.calculate_summary(
+        total_clauses=len(state.clauses) if state.clauses else 5,
+        findings=state.final_findings
+    )
+
+    report_id = f"rep-{uuid.uuid4().hex[:6]}"
+    report = ComplianceReport(
+        report_id=report_id,
+        matter_id=req.matter_id,
+        document_id=matter_docs[0].id if matter_docs else "doc-matter",
+        summary=summary,
+        findings=state.final_findings,
+        executive_memo=f"Matter-wide legal review completed across {len(matter_docs)} documents under {state.jurisdiction} jurisdiction. Identified {len(state.final_findings)} findings and cross-document reconciliation items.",
+        agent_trace_id=trace.trace_id
+    )
+
+    IN_MEMORY_REPORTS[report_id] = report
+    return report
+
+
 @router.get("/findings", response_model=List[Finding])
 async def list_findings(document_id: Optional[str] = None):
     if document_id:
         return [f for f in IN_MEMORY_FINDINGS.values() if f.document_id == document_id]
     return list(IN_MEMORY_FINDINGS.values())
+
 
 @router.post("/decision", response_model=Finding)
 async def record_human_decision(req: HumanDecisionRequest):
@@ -120,10 +167,12 @@ async def record_human_decision(req: HumanDecisionRequest):
     IN_MEMORY_AUDIT_LOGS.append(audit_evt)
     return finding
 
+
 @router.get("/studio/audio", response_model=AudioBriefing)
 async def get_audio_briefing():
     findings = list(IN_MEMORY_FINDINGS.values())
     return studio_generators.generate_audio_briefing(findings)
+
 
 @router.get("/studio/mindmap")
 async def get_mindmap():
@@ -131,8 +180,8 @@ async def get_mindmap():
     markdown_str = studio_generators.generate_mindmap_markdown(findings)
     return {"markdown": markdown_str}
 
+
 @router.get("/studio/flashcards", response_model=List[Flashcard])
 async def get_flashcards():
     findings = list(IN_MEMORY_FINDINGS.values())
     return studio_generators.generate_flashcards(findings)
-
