@@ -9,7 +9,8 @@ class DocumentParser:
     def parse_bytes(self, filename: str, content_bytes: bytes) -> Tuple[str, Dict[str, Any]]:
         document_validator.validate_filename_and_size(filename, len(content_bytes))
         
-        ext = "." + filename.split(".")[-1].lower() if "." in filename else ""
+        import pathlib
+        ext = pathlib.Path(filename).suffix.lower()
         metadata = {
             "filename": filename,
             "file_size": len(content_bytes),

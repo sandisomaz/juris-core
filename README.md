@@ -101,7 +101,7 @@ JurisCore is designed for law firms, enterprise in-house legal teams, compliance
 
 ### 2. Installation
 ```bash
-git clone https://github.com/your-org/juris-core.git
+git clone https://github.com/sandisomaz/juris-core.git
 cd juris-core
 python -m venv venv
 # On Windows:
@@ -114,9 +114,9 @@ pip install -r requirements.txt
 
 ### 3. Running the Server
 ```bash
-python -m uvicorn src.main:app --reload --port 8000
+python -m uvicorn src.main:app --reload --port 8888
 ```
-Open your browser at `http://localhost:8000/` to access the JurisCore Web Application and Workspace.
+Open your browser at `http://localhost:8888/` to access the JurisCore Web Application and Workspace.
 
 ---
 
