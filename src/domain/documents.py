@@ -9,6 +9,10 @@ class DocumentType(str, Enum):
     ONBOARDING_PACK = "ONBOARDING_PACK"
     SUPPLIER_FORM = "SUPPLIER_FORM"
     PROCEDURE = "PROCEDURE"
+    MEMO = "MEMO"
+    COURT_FILING = "COURT_FILING"
+    NOTICE = "NOTICE"
+    INVOICE = "INVOICE"
     UNKNOWN = "UNKNOWN"
 
 class Clause(BaseModel):
@@ -35,5 +39,6 @@ class Document(DocumentBase):
     version: int = 1
     upload_timestamp: datetime = Field(default_factory=datetime.utcnow)
     clause_count: int = 0
+    processing_status: str = "Verified"
     clauses: List[Clause] = Field(default_factory=list)
     parsed_metadata: Dict[str, Any] = Field(default_factory=dict)
