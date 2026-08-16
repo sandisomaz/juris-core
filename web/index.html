@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JurisCore — Regulatory Intelligence Shell</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Markmap Autoloader CDN for interactive contract relationship graph -->
-  <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
 </head>
 <body>
 
@@ -32,34 +30,46 @@
       </div>
 
       <div class="rail-sections">
-        <div class="rail-section-title">History</div>
+        <div class="rail-section-title">Recent Matter Audits</div>
         <div class="rail-item active" onclick="loadChat('c-001')">
-          <span class="rail-item-icon">💬</span>
+          <span class="rail-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
           <span class="rail-item-text">ABC Logistics Audit</span>
         </div>
         <div class="rail-item" onclick="loadChat('c-002')">
-          <span class="rail-item-icon">📌</span>
+          <span class="rail-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-2l-2-4V5h1V3H6v2h1v6l-2 4v2z"/></svg>
+          </span>
           <span class="rail-item-text">POPIA Section 22 Inquiry</span>
         </div>
 
-        <div class="rail-section-title">Matters (Projects)</div>
+        <div class="rail-section-title">Active Client Matters</div>
         <div class="rail-item" onclick="loadMatter('m-001')">
-          <span class="rail-item-icon">📁</span>
+          <span class="rail-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </span>
           <span class="rail-item-text">Vendor Procurement Onboarding</span>
         </div>
 
-        <div class="rail-section-title">Artifacts</div>
+        <div class="rail-section-title">Work Product & Drafts</div>
         <div class="rail-item" onclick="openArtifact('report')">
-          <span class="rail-item-icon">📄</span>
+          <span class="rail-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </span>
           <span class="rail-item-text">Compliance Memos</span>
         </div>
         <div class="rail-item" onclick="openArtifact('redlines')">
-          <span class="rail-item-icon">✂️</span>
-          <span class="rail-item-text">Surgical Redlines</span>
+          <span class="rail-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </span>
+          <span class="rail-item-text">Proposed Amendments</span>
         </div>
         <div class="rail-item" onclick="openArtifact('audit')">
-          <span class="rail-item-icon">📥</span>
-          <span class="rail-item-text">Audit Trail Logs</span>
+          <span class="rail-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
+          <span class="rail-item-text">Defensibility Logs</span>
         </div>
       </div>
     </nav>
@@ -69,14 +79,24 @@
 
       <!-- TOP HEADER BAR -->
       <header class="top-bar">
-        <div class="active-matter-title">
-          <span>Matter:</span> <b>ABC Logistics Vendor Onboarding & POPIA Audit</b>
-          <span class="workspace-state-badge" id="layout-state-badge">CONVERSATION STATE (2 COLUMNS)</span>
+        <div class="active-matter-container">
+          <span class="matter-label">Client Matter:</span>
+          <select id="matter-select" class="matter-dropdown" onchange="handleMatterSelect(this.value)">
+            <option value="m-001" selected>ABC Logistics — Vendor Onboarding & POPIA Audit</option>
+            <option value="m-002">FinTech Global — Cross-Border Transfer Compliance</option>
+            <option value="m-003">HealthCare Trust — Patient Record POPIA §19 Audit</option>
+          </select>
         </div>
 
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-outline" id="btn-toggle-workspace" onclick="toggleWorkspaceColumn()">🎛️ Workspace View</button>
-          <button class="btn btn-navy" onclick="exportAuditTrail()">📥 Export Audit Log</button>
+        <div class="top-bar-actions">
+          <!-- 3-Segment Layout Control -->
+          <div class="layout-toggle-group" id="layout-toggle-group">
+            <button class="layout-btn active" id="layout-btn-chat" onclick="setLayoutMode('chat')" title="Chat Focus (2 Columns) [Ctrl+1]">Chat Focus</button>
+            <button class="layout-btn" id="layout-btn-split" onclick="setLayoutMode('split')" title="Side-by-Side Review (3 Columns) [Ctrl+2]">Side-by-Side Review</button>
+            <button class="layout-btn" id="layout-btn-doc" onclick="setLayoutMode('doc')" title="Full Document View [Ctrl+3]">Full Document</button>
+          </div>
+
+          <button class="btn btn-navy" onclick="exportAuditTrail()">Export Audit Log</button>
         </div>
       </header>
 
@@ -91,15 +111,15 @@
             <div class="thinking-banner-head" onclick="toggleThinkingExpand()">
               <div class="thinking-status-label">
                 <div class="thinking-pulse-dot" id="thinking-pulse-dot"></div>
-                <span id="thinking-status-text">🧠 AI ASSISTANT REASONING STREAM • READY</span>
+                <span id="thinking-status-text">Compliance Assistant Analysis • Ready</span>
               </div>
-              <span style="font-size: 11px; color: var(--text-tertiary);" id="thinking-toggle-arrow">▲ Collapse Steps</span>
+              <span style="font-size: 11px; color: var(--text-tertiary);" id="thinking-toggle-arrow">Collapse Steps</span>
             </div>
             <div class="thinking-steps-stream" id="thinking-steps-feed">
-              <div class="thinking-step-line">📁 <b>Step 1:</b> Ingested 2 contract sources for ABC Logistics matter</div>
-              <div class="thinking-step-line">📜 <b>Step 2:</b> Evaluated POPIA Section 19, Section 21, and Section 22 rules</div>
-              <div class="thinking-step-line">⚖️ <b>Step 3:</b> Flagged 120h breach SLA timeline exceeding statutory max limit</div>
-              <div class="thinking-step-line escalation">⚡ <b>Step 4:</b> Human-in-the-Loop review required for Clause 3.0</div>
+              <div class="thinking-step-line"><b>Step 1:</b> Ingested 2 contract sources for ABC Logistics matter</div>
+              <div class="thinking-step-line"><b>Step 2:</b> Cross-referenced POPIA Sections 19, 21, and 22 statutory rules</div>
+              <div class="thinking-step-line"><b>Step 3:</b> Flagged 120-hour breach notice window exceeding statutory maximum</div>
+              <div class="thinking-step-line escalation"><b>Step 4:</b> Requires Senior Counsel Sign-Off for Clause 3.0</div>
             </div>
           </div>
 
@@ -107,30 +127,45 @@
           <div class="chat-stream" id="chat-stream">
             <div class="msg ai">
               <div class="ai-body">
-                Welcome to <strong>JurisCore</strong>. Ask a quick compliance question, or prompt multi-step contract review to automatically open the full Workspace.
+                Welcome to <strong>JurisCore</strong>. Ask a quick compliance question, or run a full contract audit to inspect source clauses and proposed amendments side-by-side.
                 <br><br>
-                I have completed the legal compliance evaluation for this matter across all <strong>2 sources</strong>. 
-                I found 2 key items requiring attention:
+                I have completed the compliance review across all <strong>2 contract sources</strong> in this matter. Here are the 2 items requiring your attention:
                 <br><br>
-                1. <strong>Defective Breach SLA</strong>: Clause 3.0 notice window exceeds statutory limits <span class="cite wrong" onclick="openWorkspaceTab('sources', '3_0')">POPIA §22 · WRONG_SECTION</span>.
+                1. <strong>Defective Incident Notification SLA</strong>: Clause 3.0 requires 120-hour notice, which exceeds statutory limits <span class="cite wrong" onclick="openWorkspaceTab('sources', '3_0')" title="Click to view Clause 3.0 in Document Reader">POPIA §22 · Non-Compliant SLA</span>.
                 <br><br>
-                2. <strong>Uncapped Liability</strong>: Clause 4.0 contains unlimited financial liability <span class="cite outdated" onclick="openWorkspaceTab('sources', '4_0')">Clause 4.0 · UNCAPPED</span>.
+                2. <strong>Uncapped Liability Risk</strong>: Clause 4.0 contains unlimited financial indemnity without a liability cap <span class="cite outdated" onclick="openWorkspaceTab('sources', '4_0')" title="Click to view Clause 4.0 in Document Reader">Clause 4.0 · Unlimited Exposure</span>.
 
-                <!-- Generated Artifact Attachment Cards -->
-                <div class="chat-attachment-card" onclick="openWorkspaceTab('report')">
-                  <span class="attachment-icon">📄</span>
-                  <div>
-                    <div class="attachment-title">Executive Compliance Memorandum v1.pdf</div>
-                    <div class="attachment-sub">Click to inspect matter compliance report & findings</div>
+                <!-- Generated Work Product Cards -->
+                <div class="artifact-card-work" onclick="openWorkspaceTab('report')">
+                  <div class="artifact-card-left">
+                    <div class="artifact-file-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <div>
+                      <div class="artifact-title">Executive_Compliance_Memorandum_v1.docx</div>
+                      <div class="artifact-sub">Word Document • 4.2 KB • Click to open in panel</div>
+                    </div>
                   </div>
+                  <button class="artifact-dl-btn" onclick="event.stopPropagation(); downloadDocxReport()" title="Download DOCX">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download
+                  </button>
                 </div>
 
-                <div class="chat-attachment-card" onclick="openWorkspaceTab('redlines')">
-                  <span class="attachment-icon">✂️</span>
-                  <div>
-                    <div class="attachment-title">Clause 3.0 Surgical Redline SLA Amendment</div>
-                    <div class="attachment-sub">Click to inspect and accept/reject proposed redlines</div>
+                <div class="artifact-card-work" onclick="openWorkspaceTab('redlines')">
+                  <div class="artifact-card-left">
+                    <div class="artifact-file-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </div>
+                    <div>
+                      <div class="artifact-title">Clause_3.0_Track_Changes_Amendment.docx</div>
+                      <div class="artifact-sub">Word Track Changes • 3.8 KB • Click to review</div>
+                    </div>
                   </div>
+                  <button class="artifact-dl-btn" onclick="event.stopPropagation(); downloadDocxReport()" title="Download DOCX">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download
+                  </button>
                 </div>
               </div>
             </div>
@@ -139,13 +174,13 @@
           <!-- CHAT INPUT & PROMPT SUGGESTION CHIPS -->
           <div class="chat-input-bar">
             <div class="prompt-chips-bar">
-              <div class="prompt-chip" onclick="clickPromptChip('Review this contract and open workspace')">🔍 Review Contract & Open Workspace</div>
-              <div class="prompt-chip" onclick="clickPromptChip('Cross-reference DPA against Master Supplier Agreement')">🔄 Cross-Reference DPA</div>
-              <div class="prompt-chip" onclick="clickPromptChip('Check POPIA §22 statutory breach SLA requirements')">⚖️ Verify POPIA §22</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Run Full POPIA Compliance Audit')">Run Full POPIA Compliance Audit</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Cross-Reference Data Processing Terms')">Cross-Reference Data Processing Terms</div>
+              <div class="prompt-chip" onclick="clickPromptChip('Verify Breach Notification Timelines')">Verify Breach Notification Timelines</div>
             </div>
 
             <div class="chat-input-box">
-              <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask a question or type 'review this contract' to open workspace..." onkeypress="handleChatKeyPress(event)">
+              <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask a compliance question or type an instruction..." onkeypress="handleChatKeyPress(event)">
               <button class="btn btn-teal" onclick="sendChatMessage()">Send Prompt</button>
             </div>
           </div>
@@ -158,10 +193,9 @@
           <!-- Workspace Tab Navigation -->
           <div class="ws-tab-bar">
             <div class="ws-tab active" onclick="switchWsTab('sources')">Sources (2)</div>
-            <div class="ws-tab" onclick="switchWsTab('report')">Report</div>
-            <div class="ws-tab" onclick="switchWsTab('redlines')">Redlines</div>
-            <div class="ws-tab" onclick="switchWsTab('mindmap')">Relationship Map</div>
-            <div class="ws-tab" onclick="switchWsTab('audit')">Audit Export</div>
+            <div class="ws-tab" onclick="switchWsTab('report')">Compliance Memo</div>
+            <div class="ws-tab" onclick="switchWsTab('redlines')">Track Changes</div>
+            <div class="ws-tab" onclick="switchWsTab('audit')">Audit Proof</div>
           </div>
 
           <div class="ws-body">
@@ -169,77 +203,92 @@
             <!-- TAB 1: SOURCES & DOCUMENT READER -->
             <div id="ws-tab-sources" class="ws-tab-content active">
               <div class="sources-dropzone" onclick="triggerFileInput()">
-                <b>Drop contract documents here</b>
-                Batch upload PDF, DOCX, TXT up to 25MB
+                <b>Drop contract documents here to add to matter</b>
+                Batch upload PDF, Word DOCX, or TXT up to 25MB
                 <input type="file" id="file-input" multiple style="display:none" onchange="handleFileSelected(event)">
               </div>
 
               <div id="sources-list-container">
-                <div class="source-item-card">
-                  <span>1. Supplier_Agreement.txt</span>
+                <div class="source-item-card active-doc" id="doc-card-1" onclick="switchDocument('doc1')">
+                  <div>
+                    <span>1. Supplier_Agreement.txt</span>
+                    <div style="font-size: 11px; color: var(--text-tertiary); font-weight: normal;">Master Agreement • 4 Clauses</div>
+                  </div>
                   <span class="chip verified">VERIFIED</span>
                 </div>
-                <div class="source-item-card">
-                  <span>2. Data_Processing_DPA.txt</span>
+                <div class="source-item-card" id="doc-card-2" onclick="switchDocument('doc2')">
+                  <div>
+                    <span>2. Data_Processing_DPA.txt</span>
+                    <div style="font-size: 11px; color: var(--text-tertiary); font-weight: normal;">Security Addendum • 2 Clauses</div>
+                  </div>
                   <span class="chip review">NEEDS REVIEW</span>
                 </div>
               </div>
 
-              <div class="panel-title" style="margin: 14px 0 8px;">Document Reader — Supplier_Agreement.txt</div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin: 16px 0 8px;">
+                <div class="panel-title" id="reader-title-display" style="margin: 0;">Document Reader — Supplier_Agreement.txt</div>
+                <div class="font-size-toggle">
+                  <button class="font-toggle-btn active" id="font-btn-std" onclick="setFontSize('standard')" title="Standard Text">A</button>
+                  <button class="font-toggle-btn" id="font-btn-lg" onclick="setFontSize('large')" title="Large Readable Text">A+</button>
+                </div>
+              </div>
+
               <div class="reader-box" id="reader-content-box">
-                <div id="clause-text-1_0"><b>1. DEFINITIONS:</b> Entered into under South African jurisdiction.</div>
-                <div id="clause-text-2_0" style="margin-top: 6px;"><b>2. OPERATOR SECURITY:</b> Data confidentiality per POPIA §21.</div>
-                <div id="clause-text-3_0" style="margin-top: 6px;"><b>3. INCIDENT NOTIFICATION:</b> <mark>Operator shall notify Responsible Party within 120 hours of breach.</mark></div>
-                <div id="clause-text-4_0" style="margin-top: 6px;"><b>4. INDEMNITY:</b> Supplier provides indemnity without financial cap.</div>
+                <div id="clause-text-1_0"><b>1. DEFINITIONS:</b> This Agreement is entered into under South African statutory jurisdiction.</div>
+                <div id="clause-text-2_0" style="margin-top: 10px;"><b>2. OPERATOR SECURITY:</b> Data confidentiality and technical controls maintained per POPIA Section 21.</div>
+                <div id="clause-text-3_0" style="margin-top: 10px;"><b>3. INCIDENT NOTIFICATION:</b> <mark>Operator shall notify Responsible Party within 120 hours of becoming aware of a data compromise.</mark></div>
+                <div id="clause-text-4_0" style="margin-top: 10px;"><b>4. INDEMNITY:</b> Supplier provides an indemnity to Customer for all losses without financial limitation or monetary cap.</div>
               </div>
             </div>
 
             <!-- TAB 2: COMPLIANCE REPORT -->
             <div id="ws-tab-report" class="ws-tab-content">
-              <div class="panel-title" style="margin-bottom: 10px;">Executive Compliance Memorandum</div>
-              <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-primary);">
-                <strong style="color: var(--navy);">Matter Audit Summary</strong><br>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <div class="panel-title" style="margin: 0;">Executive Compliance Memorandum</div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-navy" style="font-size: 11px; padding: 4px 10px;" onclick="downloadDocxReport()">Download DOCX</button>
+                  <button class="btn btn-outline" style="font-size: 11px; padding: 4px 10px;" onclick="window.open('/api/reports/default/export/html', '_blank')">Print / View</button>
+                </div>
+              </div>
+              <div style="background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: 8px; font-size: 13.5px; line-height: 1.65; color: var(--text-primary);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                  <strong style="color: var(--navy); font-size: 14.5px;">Matter Audit Summary</strong>
+                  <span class="chip review" style="font-weight: 700;">Moderate Risk — 2 Action Items</span>
+                </div>
                 Jurisdiction: South Africa (POPIA Act 4 of 2013)<br>
-                Compliance Score: <b style="color: var(--amber);">62%</b><br><br>
-                <b>Key Findings:</b>
-                <ul style="margin-left: 18px; margin-top: 6px;">
-                  <li>Clause 3.0 120h SLA exceeds statutory max notice window.</li>
-                  <li>Clause 4.0 contains uncapped indemnity liability exposure.</li>
+                Overall Compliance Score: <b style="color: var(--amber); font-size: 16px;">62%</b><br><br>
+                <b>Key Remediation Requirements:</b>
+                <ul style="margin-left: 18px; margin-top: 8px;">
+                  <li><strong>Clause 3.0</strong>: 120-hour notice SLA exceeds statutory requirement. POPIA s22 requires notification as soon as reasonably possible.</li>
+                  <li><strong>Clause 4.0</strong>: Uncapped indemnity liability exposure without standard 12-month contract value limit.</li>
                 </ul>
               </div>
             </div>
 
-            <!-- TAB 3: SURGICAL REDLINES -->
+            <!-- TAB 3: PROPOSED CLAUSE AMENDMENTS (WORD TRACK CHANGES) -->
             <div id="ws-tab-redlines" class="ws-tab-content">
-              <div class="panel-title" style="margin-bottom: 10px;">Surgical Redlines Sandbox</div>
-              <div style="background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
-                <b>Clause 3.0 SLA Amendment:</b><br>
-                <div class="mono" style="margin-top: 6px; padding: 8px; background: var(--surface-card); border-radius: 4px; border: 1px solid var(--border-dark);">
+              <div class="panel-title" style="margin-bottom: 10px;">Proposed Clause Amendments (Word Track Changes)</div>
+              <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 13px; line-height: 1.65;">
+                <b>Clause 3.0 Incident Notification Amendment:</b><br>
+                <div class="mono" style="margin-top: 8px; padding: 10px; background: var(--surface-card); border-radius: 6px; border: 1px solid var(--border-dark); font-size: 13px;">
                   <span style="color: var(--red); text-decoration: line-through;">within 120 hours of becoming aware</span> 
                   <span style="color: var(--clear); font-weight: 600;">without undue delay and in any event within 24 hours of becoming aware</span>
                 </div>
-                <div style="display: flex; gap: 6px; margin-top: 10px;">
-                  <button class="btn btn-teal" style="font-size: 11px;" onclick="acceptRedline('r1')">✓ Accept Redline</button>
-                  <button class="btn btn-outline" style="font-size: 11px;" onclick="rejectRedline('r1')">Reject</button>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                  <button class="btn btn-teal" style="font-size: 12px;" onclick="acceptRedline('r1')">✓ Apply Amendment</button>
+                  <button class="btn btn-outline" style="font-size: 12px;" onclick="rejectRedline('r1')">Keep Original</button>
                 </div>
               </div>
             </div>
 
-            <!-- TAB 4: RELATIONSHIP MAP (MARKMAP) -->
-            <div id="ws-tab-mindmap" class="ws-tab-content">
-              <div class="panel-title" style="margin-bottom: 10px;">Contract Relationship Graph</div>
-              <div style="height: 320px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden;">
-                <svg id="markmap-canvas" style="width:100%; height:100%;"></svg>
-              </div>
-            </div>
-
-            <!-- TAB 5: AUDIT EXPORT -->
+            <!-- TAB 4: AUDIT PROOF -->
             <div id="ws-tab-audit" class="ws-tab-content">
-              <div class="panel-title" style="margin-bottom: 10px;">Immutable Audit Record</div>
-              <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 8px; font-size: 12.5px; color: var(--text-primary);">
-                Every autonomous agent action and human sign-off is recorded with an immutable SHA-256 hash.
+              <div class="panel-title" style="margin-bottom: 10px;">Regulatory Defensibility & Audit Proof</div>
+              <div style="background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: 8px; font-size: 13px; line-height: 1.6; color: var(--text-primary);">
+                <strong>Official Regulatory Audit Trail</strong><br>
+                Every automated compliance check and counsel approval is recorded with non-repudiation guarantees, formatted for regulatory inquiries, data protection authorities, and court submissions.
                 <br><br>
-                <button class="btn btn-navy" style="width: 100%;" onclick="exportAuditTrail()">📥 Download Audit Log (JSON)</button>
+                <button class="btn btn-navy" style="width: 100%;" onclick="exportAuditTrail()">Download Defensibility Log (JSON)</button>
               </div>
             </div>
 
@@ -252,6 +301,9 @@
     </div>
 
   </div>
+
+  <!-- Non-Blocking Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
 
   <script src="app.js"></script>
 </body>
