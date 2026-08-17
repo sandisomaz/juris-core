@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 from src.domain.findings import Finding, SeverityLevel
@@ -15,7 +15,7 @@ class ComplianceReport(BaseModel):
     report_id: str
     matter_id: str
     document_id: str
-    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     summary: ReviewSummary
     findings: List[Finding] = Field(default_factory=list)
     executive_memo: str = ""
