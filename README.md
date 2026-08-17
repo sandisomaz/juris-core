@@ -55,25 +55,34 @@ graph TD
 
 ## Key Capabilities
 
-### 1. Unified Artifact Studio & Matter Project Hub
-* **Collapsible Navigation Rail**: Dedicated drawer for Active Client Matters, Past Audits, and Work Product.
-* **Conversational Chat Stream**: Interactive compliance dialogue with inline downloadable artifact cards (`.docx`, `.pdf`).
-* **Side-by-Side Document Studio**: Real-time reader with adjustable typography scaling (`A / A+`), dynamic document switching, and Word Track Changes sandbox.
-* **Client Matter Project Hub**: Centralized matter view featuring matter scope memory, firm negotiation playbook guidelines, and contract file capacity meters.
+### 1. Matter Lobby & Client Portfolio Dashboard
+* **Client Matter Portfolio**: High-level matter lobby displaying matter cards with statutory jurisdictions (POPIA Act 4 of 2013, GDPR, Companies Act), live compliance score gauges (`62%`, `78%`, `100%`), and risk triage chips.
+* **Instant Matter Search & Creation**: Real-time matter filtering and a 2-step matter creation wizard supporting multi-file contract bundle uploads (PDF, DOCX, TXT up to 25MB).
 
-### 2. Deterministic Statutory Verification Engine
+### 2. 3-Panel Legal Studio & Low-Glare Design System
+* **Ergonomic Design System**: Tailored dark theme (`#09101d` background, `#0f192b` surfaces, and pearl `#e6edf7` text) exceeding WCAG AAA contrast standards (>7:1) for comfortable reading.
+* **3-Segment Layout Control**: Seamless switching between **Chat Focus**, **Side-by-Side Review**, and **Full Document** view modes (`Ctrl+1`, `Ctrl+2`, `Ctrl+3`).
+* **Panel 1 (Sources Rail)**: Contract source tree with dynamic capacity meters, dropzone upload, and clause structure outline.
+* **Panel 2 (Center Chat & Live Analysis)**: Collapsible Agent Trace reasoning banner, statutory citation badges, and prompt accelerators.
+* **Panel 3 (Work Product Studio)**: Executive Compliance Memorandum, Word Track Changes sandbox, and cryptographic audit log.
+
+### 3. Clause Inline Editing & Real-Time Remediation
+* **In-Place Clause Editor**: Counsel can click and edit clauses directly inside the Document Reader.
+* **Dynamic Finding Resolution**: Correcting a statutory violation (e.g. changing 120h breach notice to 24h) instantly recalculates the matter compliance score, marks findings as resolved, and propagates updates to Track Changes redlines.
+
+### 4. Deterministic Statutory Verification Engine
 * **Legal Source Registry**: Zero-hallucination statutory ground truth (e.g., South African POPIA Act 4 of 2013, GDPR, Companies Act).
 * **Automated Citation Status**: Flags statutory citations as `VALID`, `OUTDATED`, `WRONG_SECTION`, or `UNKNOWN`.
 * **Hard SLA & Liability Sweepers**: Deterministically flags breach notification timelines exceeding statutory limits (e.g. 120h vs POPIA s22) and uncapped indemnity liabilities.
 
-### 3. Sub-4B Local Model Support (Privacy & Cost Efficiency)
+### 5. Sub-4B Local Model Support (Privacy & Cost Efficiency)
 * Optimized for **Ollama `qwen2.5:3b`** running 100% locally with zero cloud data egress.
 * Robust prompt framing with JSON schema validation, automatic retry, and cloud LLM fallback (Claude 3.5 Sonnet / GPT-4o).
 
-### 4. Real-Time SSE Agent Streaming
+### 6. Real-Time SSE Agent Streaming
 * Live Server-Sent Events stream (`/api/events/stream`) broadcasting agent step execution, model reasoning milestones, and latencies directly to the frontend.
 
-### 5. Native Microsoft Word (.docx) Export
+### 7. Native Microsoft Word (.docx) Export
 * Generates genuine OpenXML `.docx` files containing the executive compliance memorandum and proposed amendments formatted in Word Track Changes style.
 
 ---
