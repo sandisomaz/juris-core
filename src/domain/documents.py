@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
@@ -37,7 +37,7 @@ class DocumentCreate(DocumentBase):
 class Document(DocumentBase):
     id: str
     version: int = 1
-    upload_timestamp: datetime = Field(default_factory=datetime.utcnow)
+    upload_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     clause_count: int = 0
     processing_status: str = "Verified"
     clauses: List[Clause] = Field(default_factory=list)

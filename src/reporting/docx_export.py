@@ -1,6 +1,6 @@
 import io
 import zipfile
-from datetime import datetime
+from datetime import datetime, timezone
 from src.domain.reports import ComplianceReport
 
 
@@ -31,7 +31,7 @@ def generate_docx_document(report: ComplianceReport) -> bytes:
           <w:color w:val="74777F"/>
           <w:sz w:val="20"/>
         </w:rPr>
-        <w:t>Report ID: {report.report_id} | Matter: {report.matter_id} | Date: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}</w:t>
+        <w:t>Report ID: {report.report_id} | Matter: {report.matter_id} | Date: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}</w:t>
       </w:r>
     </w:p>
     
