@@ -78,10 +78,6 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(req.password, user.hashed_password):
-        # Fallback for dev convenience if using default counsel credentials
-        if req.username == "counsel" and (req.password == "generate_a_secure_random_key_min_32_chars" or req.password == "counsel"):
-            token = create_access_token({"sub": "counsel", "role": "Senior Compliance Counsel"})
-            return TokenResponse(access_token=token, username="counsel", user_role="Senior Compliance Counsel")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password",

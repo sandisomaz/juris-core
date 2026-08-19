@@ -1,3 +1,4 @@
+import os
 import uuid
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
@@ -40,21 +41,23 @@ async def init_db():
         await conn.run_sync(Base.metadata.create_all)
 
     async with AsyncSessionLocal() as session:
-        # Seed admin user if not exists
-        stmt = select(UserDB).where(UserDB.username == "counsel")
-        result = await session.execute(stmt)
-        user = result.scalar_one_or_none()
+        # Seed initial admin user if explicitly configured via environment
+        admin_password = os.getenv("JURISCORE_ADMIN_PASSWORD") or os.getenv("INITIAL_ADMIN_PASSWORD")
+        if admin_password:
+            stmt = select(UserDB).where(UserDB.username == "counsel")
+            result = await session.execute(stmt)
+            user = result.scalar_one_or_none()
 
-        if not user:
-            default_user = UserDB(
-                id=str(uuid.uuid4()),
-                username="counsel",
-                email="counsel@juriscore.io",
-                hashed_password=hash_password("generate_a_secure_random_key_min_32_chars"),
-                full_name="Senior Compliance Counsel",
-                role="Senior Compliance Counsel"
-            )
-            session.add(default_user)
+            if not user:
+                default_user = UserDB(
+                    id=str(uuid.uuid4()),
+                    username="counsel",
+                    email="counsel@juriscore.io",
+                    hashed_password=hash_password(admin_password),
+                    full_name="Senior Compliance Counsel",
+                    role="Senior Compliance Counsel"
+                )
+                session.add(default_user)
 
         # Seed initial matter if not exists
         m_stmt = select(MatterDB).where(MatterDB.id == "m-001")

@@ -47,12 +47,23 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Environments
+# Environments & Secrets
 .env
+.env.*
+*.key
+*.pem
+*.secret
 .venv
 env/
 venv/
 ENV/
+
+# LLM Context Dumps & Helper Scripts
+codebase_dump.txt
+codebase_context.txt
+*_context.txt
+scripts/export_codebase.py
+export_codebase.py
 
 # Database
 *.db

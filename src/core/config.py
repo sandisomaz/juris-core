@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./juris_core.db"
     DB_ECHO: bool = False
 
-    SECRET_KEY: str = os.getenv("JURISCORE_SECRET_KEY", "generate_a_secure_random_key_min_32_chars")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", os.getenv("JURISCORE_SECRET_KEY", ""))
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     ALLOWED_ORIGINS: List[str] = [
@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    def __init__(self, **values):
+        import secrets
+        super().__init__(**values)
+        if not self.SECRET_KEY:
+            # Ephemeral cryptographically random secret if none provided in environment
+            self.SECRET_KEY = secrets.token_hex(32)
 
 
 settings = Settings()
