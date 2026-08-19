@@ -62,6 +62,8 @@ ENV/
 codebase_dump.txt
 codebase_context.txt
 *_context.txt
+*codebase*.txt
+* codebase.txt
 scripts/export_codebase.py
 export_codebase.py
 
